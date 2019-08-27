@@ -5,7 +5,7 @@
 //  Created by Benjamin Wetherfield on 8/27/19.
 //
 
-struct UnweightedNetwork<InnerNode: Hashable> {
+public struct UnweightedNetwork<InnerNode: Hashable> {
     typealias Node = FlowNode<InnerNode>
     
     private var adjacencies: [Node: [Node]] = [.source: [], .sink: []]
