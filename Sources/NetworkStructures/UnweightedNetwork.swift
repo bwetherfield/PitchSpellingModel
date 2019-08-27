@@ -6,5 +6,8 @@
 //
 
 struct UnweightedNetwork<InnerNode: Hashable> {
-
+    typealias Node = FlowNode<InnerNode>
+    
+    let adjacencies: [Node: [Node]]
+    let reverseAdjacencies: [Node: [Node]]
 }
