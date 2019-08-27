@@ -1,0 +1,52 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "Math",
+        "repositoryURL": "https://github.com/dn-m/Math",
+        "state": {
+          "branch": null,
+          "revision": "519c7e3128e80fbfd43d7cc0c0947b86d423db8a",
+          "version": "0.8.0"
+        }
+      },
+      {
+        "package": "Music",
+        "repositoryURL": "https://github.com/dn-m/Music",
+        "state": {
+          "branch": null,
+          "revision": "f3fd487603a05c7b7ff20f1e8ad29d866a60fded",
+          "version": "0.17.1"
+        }
+      },
+      {
+        "package": "NotationModel",
+        "repositoryURL": "https://github.com/dn-m/NotationModel",
+        "state": {
+          "branch": null,
+          "revision": "a68f1af89ca15c41736e25f17616a4504838073c",
+          "version": "0.9.0"
+        }
+      },
+      {
+        "package": "PerformanceTesting",
+        "repositoryURL": "https://github.com/dn-m/PerformanceTesting",
+        "state": {
+          "branch": "pitchspeller-dependency",
+          "revision": "0c298e24006ae3ddd7282f83e85f87a760113637",
+          "version": null
+        }
+      },
+      {
+        "package": "Structure",
+        "repositoryURL": "https://github.com/dn-m/Structure",
+        "state": {
+          "branch": "pitchspeller-dependency",
+          "revision": "8386aad32702a58ce0512458fbdb9ffe9a1c8357",
+          "version": null
+        }
+      }
+    ]
+  },
+  "version": 1
+}
