@@ -43,3 +43,33 @@ extension UnweightedNetwork {
         reverseAdjacencies[end]!.append(start)
     }
 }
+
+extension UnweightedNetwork {
+    
+    private func augmentingPath() -> [Node] {
+        var breadcrumbs: [Node: Node] = [:]
+        
+        func backtrace() -> [Node] {
+            var path = [Node.sink]
+            var cursor = Node.sink
+            while cursor != Node.source {
+                path.insert(breadcrumbs[cursor]!, at: 0)
+                cursor = breadcrumbs[cursor]!
+            }
+            return path
+        }
+        
+        var unvisited = Set(adjacencies.keys)
+        var queue = [Node.source]
+        while !queue.isEmpty {
+            let node = queue.removeFirst()
+            for neighbor in adjacencies[node]! where unvisited.contains(neighbor) {
+                queue.append(neighbor)
+                unvisited.remove(neighbor)
+                breadcrumbs[neighbor] = node
+                if neighbor == Node.sink { return backtrace() }
+            }
+        }
+        return []
+    }
+}
