@@ -16,6 +16,9 @@ let package = Package(
         .library(
             name: "Encodings",
             targets: ["Encodings"]),
+        .library(
+            name: "SpellingNetworks",
+            targets: ["SpellingNetworks"]),
     ],
     dependencies: [
         .package(url: "https://github.com/dn-m/Structure", .branch("pitchspeller-dependency")),
@@ -34,6 +37,9 @@ let package = Package(
         .target(
             name: "Encodings",
             dependencies: ["Pitch", "SpelledPitch", "DataStructures"]),
+        .target(
+            name: "SpellingNetworks",
+            dependencies: ["NetworkStructures", "Encodings"]),
         .testTarget(
             name: "PitchSpellingModelTests",
             dependencies: ["PitchSpellingModel"]),
