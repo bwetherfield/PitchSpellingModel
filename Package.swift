@@ -10,6 +10,9 @@ let package = Package(
         .library(
             name: "PitchSpellingModel",
             targets: ["PitchSpellingModel"]),
+        .library(
+            name: "NetworkStructures",
+            targets: ["NetworkStructures"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -20,6 +23,9 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "PitchSpellingModel",
+            dependencies: []),
+        .target(
+            name: "NetworkStructures",
             dependencies: []),
         .testTarget(
             name: "PitchSpellingModelTests",
