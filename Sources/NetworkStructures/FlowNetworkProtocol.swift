@@ -5,6 +5,8 @@
 //  Created by Benjamin Wetherfield on 8/28/19.
 //
 
+import DataStructures
+
 public protocol FlowNetworkProtocol where InnerNode: Hashable {
     associatedtype InnerNode
     typealias Node = FlowNode<InnerNode>
@@ -12,6 +14,7 @@ public protocol FlowNetworkProtocol where InnerNode: Hashable {
     var nodes: Set<Node> { get }
     
     func neighbors(of node: Node) -> [Node]
+    func reverseNeighbors(of node: Node) -> [Node]
 }
 
 extension FlowNetworkProtocol {
@@ -41,5 +44,39 @@ extension FlowNetworkProtocol {
             }
         }
         return nil
+    }
+    
+    @inlinable
+    public func sourceSearch() -> [Node] {
+        var visited: [Node] = []
+        var queue = Queue<Node>()
+        queue.enqueue(.source)
+        visited.append(.source)
+        while !queue.isEmpty {
+            let node = queue.dequeue()
+            for neighbor in neighbors(of: node) where !visited.contains(neighbor) {
+                queue.enqueue(neighbor)
+                visited.append(neighbor)
+                if neighbor == .sink { return visited }
+            }
+        }
+        return visited
+    }
+    
+    @inlinable
+    public func sinkSearch() -> [Node] {
+        var visited: [Node] = []
+        var queue = Queue<Node>()
+        queue.enqueue(.sink)
+        visited.append(.sink)
+        while !queue.isEmpty {
+            let node = queue.dequeue()
+            for neighbor in reverseNeighbors(of: node) where !visited.contains(neighbor) {
+                queue.enqueue(neighbor)
+                visited.append(neighbor)
+                if neighbor == .source { return visited }
+            }
+        }
+        return visited
     }
 }

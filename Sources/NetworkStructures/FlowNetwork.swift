@@ -5,6 +5,8 @@
 //  Created by Benjamin Wetherfield on 8/27/19.
 //
 
+import DataStructures
+
 public struct FlowNetwork<InnerNode: Hashable> {
     
     public typealias Node = FlowNode<InnerNode>
@@ -141,6 +143,49 @@ extension FlowNetwork: FlowNetworkProtocol {
     
     public func neighbors(of node: Node) -> [Node] {
         return Array(weights[node]!.keys)
+    }
+    
+    public func reverseNeighbors(of node: Node) -> [Node] {
+        return Array(reverseAdjacencies[node]!)
+    }
+}
+
+extension FlowNetwork {
+    
+    // MARK: - Computed Properties
+    
+    /// - Returns: A minimum cut with nodes included on the `sink` side in case of a
+    /// tiebreak (in- and out- edges saturated).
+    public var sinkWeightedMinimumCut: (Set<Node>, Set<Node>) {
+        let cachedResidualNetwork = residualNetwork
+        let sourceSideNodes = Set(cachedResidualNetwork.sourceSearch())
+        let notSourceSideNodes = cachedResidualNetwork.nodes.subtracting(sourceSideNodes)
+        return (sourceSideNodes, notSourceSideNodes)
+    }
+    
+    /// - Returns: A minimum cut with nodes included on the `source` side in case of a
+    /// tiebreak (in- and out- edges saturated).
+    public var sourceWeightedMinimumCut: (Set<Node>, Set<Node>) {
+        let cachedResidualNetwork = residualNetwork
+        let sinkSideNodes = Set(cachedResidualNetwork.sinkSearch())
+        let notSinkSideNodes = cachedResidualNetwork.nodes.subtracting(sinkSideNodes)
+        return (notSinkSideNodes, sinkSideNodes)
+    }
+    
+    /// - Returns: The residual network produced after
+    /// pushing all possible flow from source to sink (while satisfying flow constraints) - with
+    /// saturated edges flipped and all weights removed.
+    var residualNetwork: UnweightedNetwork<InnerNode> {
+        // Make a copy of the directed representation of the network to be mutated by pushing flow
+        // through it.
+        var residualNetwork = self
+        // While an augmenting path (a path emanating directionally from the source node) can be
+        // found, push flow through the path, mutating the residual network
+        while let augmentingPath = residualNetwork.augmentingPath() {
+            residualNetwork.pushFlow(through: augmentingPath)
+        }
+
+        return residualNetwork.unweighted
     }
 }
 

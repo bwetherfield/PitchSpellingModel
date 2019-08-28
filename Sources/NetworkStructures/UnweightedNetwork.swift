@@ -71,7 +71,11 @@ extension UnweightedNetwork: FlowNetworkProtocol {
         return Set(adjacencies.keys)
     }
     
-    public func neighbors(of node: FlowNode<InnerNode>) -> [FlowNode<InnerNode>] {
+    public func neighbors(of node: Node) -> [Node] {
         return Array(adjacencies[node]!)
+    }
+    
+    public func reverseNeighbors(of node: Node) -> [Node] {
+        return Array(reverseAdjacencies[node]!)
     }
 }
