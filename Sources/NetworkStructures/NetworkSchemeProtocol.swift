@@ -7,6 +7,6 @@
 
 import GraphSchemes
 
-protocol NetworkSchemeProtocol: DirectedGraphSchemeProtocol, UnweightedGraphSchemeProtocol where Node == FlowNode<InnerNode>, InnerNode: Hashable {
+protocol NetworkSchemeProtocol: DirectedGraphSchemeProtocol where Node == FlowNode<InnerNode>, InnerNode: Hashable {
     associatedtype InnerNode
 }
