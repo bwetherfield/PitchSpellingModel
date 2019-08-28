@@ -22,14 +22,14 @@ extension FlowNetworkScheme {
 }
 
 extension FlowNetworkScheme {
-    func weight(from start: FlowNode<InnerNode>, to end: FlowNode<InnerNode>) -> Double? {
-        return weight(Edge(start, end))
-    }
-    
-    func pullback<BackInnerNode>(innerLens: @escaping (BackInnerNode) -> InnerNode)
+    func pullback<BackInnerNode>(_ innerLens: @escaping (BackInnerNode) -> InnerNode)
         -> FlowNetworkScheme<BackInnerNode> {
             return FlowNetworkScheme<BackInnerNode>({
                 self.weight(Edge(bind(innerLens)($0.a), bind(innerLens)($0.b)))
             })
+    }
+    
+    func weight(from start: FlowNode<InnerNode>, to end: FlowNode<InnerNode>) -> Double? {
+        return weight(Edge(start, end))
     }
 }
