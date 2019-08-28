@@ -219,6 +219,18 @@ extension InvertingSpellingNetwork {
 
 extension InvertingSpellingNetwork {
     
+        mutating func partition (via indices: [Int: Int]) {
+            let adjacencyScheme = NetworkScheme<Int> { edge in
+                switch (edge.a, edge.b) {
+                case let (.internal(a), .internal(b)):
+                    return indices[a] == indices[b]
+                default:
+                    return true
+                }
+            }
+            connect(via: adjacencyScheme)
+        }
+    
     mutating func connect(via scheme: NetworkScheme<Int>) {
         let temp: NetworkScheme<Cross<Int, Tendency>>
             = (scheme + NetworkScheme<Int> { edge in edge.a == edge.b }).pullback { cross in cross.a }
