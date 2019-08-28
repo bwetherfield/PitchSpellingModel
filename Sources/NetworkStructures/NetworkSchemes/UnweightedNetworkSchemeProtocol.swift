@@ -20,4 +20,8 @@ extension UnweightedNetworkSchemeProtocol {
     public static func + (lhs: Self, rhs: Self) -> Self {
         return Self { edge in lhs.contains(edge) || rhs.contains(edge) }
     }
+    
+    public static func * (lhs: Self, rhs: Self) -> Self {
+        return Self { edge in lhs.contains(edge) && rhs.contains(edge) }
+    }
 }
