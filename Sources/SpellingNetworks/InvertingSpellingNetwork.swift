@@ -364,21 +364,21 @@ private let connectDifferentInts: NetworkScheme<UnassignedInnerNode> =
         }
     }.pullback { node in node.index.a }
 
-///// Adjacency scheme that connects `.up` tendencies to `.down` tendencies and vice versa provided
-///// the pitch classes of the nodes are connected per `upDownEdgeLookup`
-//private let upDownEdgeScheme: DirectedGraphScheme<FlowNode<Cross<Pitch.Class, Tendency>>> =
-//    GraphScheme { edge in
-//        switch (edge.a, edge.b) {
-//        case (.internal(let source), .internal(let destination)):
-//            return (
-//                source.b != destination.b &&
-//                    upDownEdgeLookup.contains(.init(source.a, destination.a))
-//            )
-//        default:
-//            return false
-//        }
-//        }.directed
-//
+/// Adjacency scheme that connects `.up` tendencies to `.down` tendencies and vice versa provided
+/// the pitch classes of the nodes are connected per `upDownEdgeLookup`
+private let upDownEdgeScheme: NetworkScheme<Cross<Pitch.Class, Tendency>> =
+    NetworkScheme { edge in
+        switch (edge.a, edge.b) {
+        case let (.internal(source), .internal(destination)):
+            return (
+                source.b != destination.b
+                    && upDownEdgeLookup.contains(.init(source.a, destination.a))
+            )
+        default:
+            return false
+        }
+    }
+
 ///// Adjacency scheme that connects nodes with the same tendency provided the pitch classes of the nodes
 ///// are *not* connected per `upDownEdgeLookup`
 //private let sameEdgeScheme: DirectedGraphScheme<FlowNode<Cross<Pitch.Class, Tendency>>> =
@@ -394,29 +394,29 @@ private let connectDifferentInts: NetworkScheme<UnassignedInnerNode> =
 //        }
 //        }.directed
 //
-///// Pairs of pitch classes that have a different skew, such that `ModifierDirection.neutral` for one node is
-///// sharp or 'up' in absolute terms and for the other node it is down
-//private let upDownEdgeLookup: [UnorderedPair<Pitch.Class>] = [
-//    .init(00, 01),
-//    .init(00, 04),
-//    .init(00, 08),
-//    .init(01, 03),
-//    .init(01, 05),
-//    .init(01, 10),
-//    .init(03, 04),
-//    .init(03, 06),
-//    .init(03, 08),
-//    .init(03, 11),
-//    .init(04, 05),
-//    .init(05, 06),
-//    .init(05, 08),
-//    .init(05, 11),
-//    .init(06, 10),
-//    .init(07, 08),
-//    .init(08, 10),
-//    .init(10, 11)
-//]
-//
+/// Pairs of pitch classes that have a different skew, such that `ModifierDirection.neutral` for one node is
+/// sharp or 'up' in absolute terms and for the other node it is down
+private let upDownEdgeLookup: Set<UnorderedPair<Pitch.Class>> = [
+    .init(00, 01),
+    .init(00, 04),
+    .init(00, 08),
+    .init(01, 03),
+    .init(01, 05),
+    .init(01, 10),
+    .init(03, 04),
+    .init(03, 06),
+    .init(03, 08),
+    .init(03, 11),
+    .init(04, 05),
+    .init(05, 06),
+    .init(05, 08),
+    .init(05, 11),
+    .init(06, 10),
+    .init(07, 08),
+    .init(08, 10),
+    .init(10, 11)
+]
+
 //extension DirectedGraph where Node == PitchSpeller.AssignedNode {
 //
 //    // MARK: - Initializers
