@@ -25,66 +25,66 @@ extension InvertingSpellingNetwork {
     public typealias PitchedEdge = UnorderedPair<PitchedNode>
 }
 
-//extension SpellingInverter {
-//
-//    // MARK: - Initializers
-//
-//    public init(spellings: [[Pitch.Spelling]], parsimonyPivot: Pitch.Spelling = .d) {
-//        let flattenedSpellings: [Pitch.Spelling] = spellings.reduce(into: []) { flattened, list in
-//            list.forEach { flattened.append($0) }
-//        }
-//        self.init(spellings: flattenedSpellings, parsimonyPivot: parsimonyPivot)
-//        var runningCount = 0
-//        var indexing: [Int: Int] = [:]
-//        for (index, container) in spellings.enumerated() {
-//            for (i,_) in container.enumerated() {
-//                indexing[i + runningCount] = index
-//            }
-//            runningCount += container.count
-//        }
-//        self.partition(via: indexing)
-//    }
-//
-//    init(spellings: [Pitch.Spelling], parsimonyPivot: Pitch.Spelling = .d) {
-//        let indexed: [Int: Pitch.Spelling] = spellings.enumerated().reduce(into: [:]) { indexedSpellings, indexedSpelling in
-//            let (index, spelling) = indexedSpelling
-//            indexedSpellings[index] = spelling
-//        }
-//        self.init(spellings: indexed, parsimonyPivot: parsimonyPivot)
-//    }
-//
-//    init(spellings: [Int: Pitch.Spelling], parsimonyPivot: Pitch.Spelling = .d) {
-//        self.flowNetwork = DirectedGraph(internalNodes: internalNodes(spellings: spellings))
-//        self.pitchClass = { int in spellings[int]?.pitchClass }
-//
-//        let specificEdgeScheme: DirectedGraphScheme<PitchSpeller.UnassignedNode> = (upDownEdgeScheme.pullback(nodeMapper) + sameEdgeScheme.pullback(nodeMapper))
-//            * connectDifferentInts
-//
-//        let sameIntEdgesScheme: DirectedGraphScheme<PitchSpeller.UnassignedNode> =
-//            sameIntsScheme * connectSameInts
-//
-//        let specificSourceScheme: DirectedGraphScheme<PitchSpeller.UnassignedNode> =
-//            sourceEdgeLookupScheme.pullback(nodeMapper)
-//
-//        let specificSinkScheme: DirectedGraphScheme<PitchSpeller.UnassignedNode> =
-//            sinkEdgeLookupScheme.pullback(nodeMapper)
-//
-//        let allSchemes: [DirectedGraphScheme<PitchSpeller.UnassignedNode>] = [
-//            specificEdgeScheme,
-//            sameIntEdgesScheme,
-//            specificSourceScheme,
-//            specificSinkScheme
-//        ]
-//
-//        let maskScheme: DirectedGraphScheme<PitchSpeller.AssignedNode> = allSchemes
-//            .reduce(DirectedGraphScheme { _ in false }, +)
-//            .pullback({ $0.unassigned })
-//
-//        // Apply masking of specific manifestations of the general global adjacency schemes
-//        self.flowNetwork.mask(maskScheme)
-//    }
-//}
-//
+extension InvertingSpellingNetwork {
+
+    // MARK: - Initializers
+
+    public init(spellings: [[Pitch.Spelling]]) {
+        let flattenedSpellings: [Pitch.Spelling] = spellings.reduce(into: []) { flattened, list in
+            list.forEach { flattened.append($0) }
+        }
+        self.init(spellings: flattenedSpellings)
+        var runningCount = 0
+        var indexing: [Int: Int] = [:]
+        for (index, container) in spellings.enumerated() {
+            for (i,_) in container.enumerated() {
+                indexing[i + runningCount] = index
+            }
+            runningCount += container.count
+        }
+        self.partition(via: indexing)
+    }
+
+    init(spellings: [Pitch.Spelling]) {
+        let indexed: [Int: Pitch.Spelling] = spellings.enumerated().reduce(into: [:]) { indexedSpellings, indexedSpelling in
+            let (index, spelling) = indexedSpelling
+            indexedSpellings[index] = spelling
+        }
+        self.init(spellings: indexed)
+    }
+
+    init(spellings: [Int: Pitch.Spelling]) {
+        self.network = UnweightedNetwork(internalNodes: internalNodes(spellings: spellings))
+        self.pitchClass = { int in spellings[int]?.pitchClass }
+
+        let specificEdgeScheme: NetworkScheme<UnassignedInnerNode> = (upDownEdgeScheme.pullback(nodeMapper) + sameEdgeScheme.pullback(nodeMapper))
+            * connectDifferentInts
+
+        let sameIntEdgesScheme: NetworkScheme<UnassignedInnerNode> =
+            sameIntsScheme * connectSameInts
+
+        let specificSourceScheme: NetworkScheme<UnassignedInnerNode> =
+            sourceEdgeLookupScheme.pullback(nodeMapper)
+
+        let specificSinkScheme: NetworkScheme<UnassignedInnerNode> =
+            sinkEdgeLookupScheme.pullback(nodeMapper)
+
+        let allSchemes: [NetworkScheme<UnassignedInnerNode>] = [
+            specificEdgeScheme,
+            sameIntEdgesScheme,
+            specificSourceScheme,
+            specificSinkScheme
+        ]
+
+        let maskScheme: NetworkScheme<AssignedInnerNode> = allSchemes
+            .reduce(NetworkScheme { _ in false }, +)
+            .pullback({ $0.unassigned })
+
+        // Apply masking of specific manifestations of the general global adjacency schemes
+        self.network.mask(maskScheme)
+    }
+}
+
 extension InvertingSpellingNetwork {
 
     /// - Returns: A concrete distribution of weights to satisfy the weight relationships delimited by
@@ -191,7 +191,7 @@ extension InvertingSpellingNetwork {
         return DiGraph(weightDependencies)
     }
     
-    /// - Returns: getter from a `PitchSpeller.UnassignedNode` to a flow network pitched node
+    /// - Returns: getter from an `UnassignedNode` value to a flow network pitched node
     var nodeMapper: (UnassignedNode) -> PitchedNode {
         return bind { Cross(self.pitchClass($0.index.a)!, $0.index.b) }
     }

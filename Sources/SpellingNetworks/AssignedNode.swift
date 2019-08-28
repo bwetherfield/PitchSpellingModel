@@ -25,7 +25,7 @@ extension FlowNode where Index == AssignedInnerNode {
     }
 }
 
-struct AssignedInnerNode: Hashable {
+public struct AssignedInnerNode: Hashable {
     let index: Cross<Int, Tendency>
     let assignment: Tendency
 }
