@@ -6,8 +6,10 @@
 //
 
 import DataStructures
+import GraphSchemes
 
-struct NetworkScheme<InnerNode: Hashable> {
+struct NetworkScheme<InnerNode: Hashable>: DirectedGraphSchemeProtocol, UnweightedGraphSchemeProtocol {
+    
     typealias Node = FlowNode<InnerNode>
     typealias Edge = OrderedPair<Node>
     
@@ -15,10 +17,22 @@ struct NetworkScheme<InnerNode: Hashable> {
 }
 
 extension NetworkScheme {
+    init(_ contains: @escaping (Edge) -> Bool) {
+        self.contains = contains
+    }
+}
+
+extension NetworkScheme {
     func pullback<BackInnerNode>(via innerLens: @escaping (BackInnerNode) -> InnerNode)
         -> NetworkScheme<BackInnerNode> {
-        return NetworkScheme<BackInnerNode> {
-            self.contains(Edge(bind(innerLens)($0.a), bind(innerLens)($0.b)))
-        }
+            return NetworkScheme<BackInnerNode>({
+                self.contains(Edge(bind(innerLens)($0.a), bind(innerLens)($0.b)))
+            })
+    }
+}
+
+extension NetworkScheme {
+    func containsEdge(from start: FlowNode<InnerNode>, to end: FlowNode<InnerNode>) -> Bool {
+        return contains(Edge(start, end))
     }
 }
