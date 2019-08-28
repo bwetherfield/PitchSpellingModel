@@ -8,7 +8,7 @@
 import DataStructures
 
 public protocol WeightedGraphSchemeProtocol: GraphSchemeProtocol {
-    associatedtype Weight
+    associatedtype Weight: Numeric
     
     var weight: (Edge) -> Weight? { get }
     
