@@ -352,11 +352,18 @@ private let connectSameInts: NetworkScheme<UnassignedInnerNode> =
             return false
         }
     }.pullback { node in node.index.a }
-//
-///// Adjacency scheme that connects nodes with different `int` values
-//private let connectDifferentInts: GraphScheme<PitchSpeller.UnassignedNode> =
-//    GraphScheme<Int> { edge in edge.a != edge.b }.pullback { node in node.index.int! }
-//
+
+/// Adjacency scheme that connects nodes with different `int` values
+private let connectDifferentInts: NetworkScheme<UnassignedInnerNode> =
+    NetworkScheme<Int> { edge in
+        switch (edge.a, edge.b) {
+        case let (.internal(a), .internal(b)):
+            return a != b
+        default:
+            return false
+        }
+    }.pullback { node in node.index.a }
+
 ///// Adjacency scheme that connects `.up` tendencies to `.down` tendencies and vice versa provided
 ///// the pitch classes of the nodes are connected per `upDownEdgeLookup`
 //private let upDownEdgeScheme: DirectedGraphScheme<FlowNode<Cross<Pitch.Class, Tendency>>> =
