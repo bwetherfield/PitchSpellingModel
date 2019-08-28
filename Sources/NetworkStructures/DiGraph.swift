@@ -1,12 +1,12 @@
 //
-//  DirectedGraph.swift
+//  DiGraph.swift
 //  NetworkStructures
 //
 //  Created by Benjamin Wetherfield on 8/27/19.
 //
 
 // Adjacency list representation of a graph
-public struct DirectedGraph<Node: Hashable> {
+public struct DiGraph<Node: Hashable> {
     
     // MARK: - Instance Properties
     
@@ -32,7 +32,7 @@ public struct DirectedGraph<Node: Hashable> {
     }
 }
 
-extension DirectedGraph {
+extension DiGraph {
     
     // MARK: - Instance Methods
     
@@ -98,8 +98,8 @@ extension DirectedGraph {
     
     // Group nodes according to the set-forming function `nodeClumper` and return the resulting
     // `AdjacencyList`, removing self-loops that arise.
-    func clumpify (using nodeClumper: @escaping (Node) -> Set<Node>) -> DirectedGraph<Set<Node>> {
-        return DirectedGraph<Set<Node>>(
+    func clumpify (using nodeClumper: @escaping (Node) -> Set<Node>) -> DiGraph<Set<Node>> {
+        return DiGraph<Set<Node>>(
             adjacencies.reduce(into: [Set<Node>: [Set<Node>]]()) { list, adjacencyPair in
                 let (node, adjacentNodes) = adjacencyPair
                 let clump = nodeClumper(node)
@@ -117,7 +117,7 @@ extension DirectedGraph {
     // Group nodes according to the function that sends a node to its strongly connected component, as found
     // by the implementation of Tarjan's algorithm, hence forming a Directed Acyclic Graph (DAG) version of
     // original `DirectedGraph` (`self`).
-    public func DAGify () -> DirectedGraph<Set<Node>> {
+    public func DAGify () -> DiGraph<Set<Node>> {
         return clumpify (using: getStronglyConnectedComponent())
     }
     
