@@ -216,6 +216,16 @@ extension InvertingSpellingNetwork {
         return bind { Cross(self.pitchClass($0.index.a)!, $0.index.b) }
     }
 }
+
+extension InvertingSpellingNetwork {
+    
+    mutating func connect(via scheme: NetworkScheme<Int>) {
+        let temp: NetworkScheme<Cross<Int, Tendency>>
+            = (scheme + NetworkScheme<Int> { edge in edge.a == edge.b }).pullback { cross in cross.a }
+        let mask: NetworkScheme<AssignedInnerNode> = temp.pullback { node in node.index }
+        network.mask(mask)
+    }
+}
 //
 //extension SpellingInverter {
 //

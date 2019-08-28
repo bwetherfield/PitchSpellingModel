@@ -24,42 +24,42 @@ extension UnweightedGraphSchemeProtocol {
 
 extension UnweightedGraphSchemeProtocol {
     
-    static func + (lhs: Self, rhs: Self) -> Self {
+    public static func + (lhs: Self, rhs: Self) -> Self {
         return Self { edge in lhs.contains(edge) || rhs.contains(edge) }
     }
 }
 
 extension UnweightedGraphSchemeProtocol {
     
-    static func * (lhs: Self, rhs: Self) -> Self {
+    public static func * (lhs: Self, rhs: Self) -> Self {
         return Self { edge in lhs.contains(edge) && rhs.contains(edge) }
     }
 }
 
 extension UnweightedGraphSchemeProtocol where Self: DirectedGraphSchemeProtocol {
     
-    static func * <Scheme> (lhs: Self, rhs: Scheme) -> Self where
+    public static func * <Scheme> (lhs: Self, rhs: Scheme) -> Self where
         Scheme: UnweightedGraphSchemeProtocol,
         Scheme.Node == Node
     {
         return Self { edge in lhs.contains(edge) && rhs.containsEdge(from: edge.a, to: edge.b) }
     }
     
-    static func * <Scheme> (lhs: Scheme, rhs: Self) -> Self where
+    public static func * <Scheme> (lhs: Scheme, rhs: Self) -> Self where
         Scheme: UnweightedGraphSchemeProtocol,
         Scheme.Node == Node
     {
         return rhs * lhs
     }
     
-    static func + (lhs: Self, rhs: Self) -> Self {
+    public static func + (lhs: Self, rhs: Self) -> Self {
         return Self { edge in lhs.contains(edge) || rhs.contains(edge) }
     }
 }
 
 extension UnweightedGraphSchemeProtocol {
     
-    static func * <Weight, Scheme> (lhs: Weight, rhs: Self) -> Scheme where
+    public static func * <Weight, Scheme> (lhs: Weight, rhs: Self) -> Scheme where
         Scheme: WeightedGraphSchemeProtocol,
         Scheme.Weight == Weight,
         Scheme.Node == Node,

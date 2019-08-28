@@ -8,22 +8,22 @@
 import DataStructures
 import GraphSchemes
 
-struct NetworkScheme<InnerNode: Hashable>: UnweightedNetworkSchemeProtocol{
+public struct NetworkScheme<InnerNode: Hashable>: UnweightedNetworkSchemeProtocol {
     
-    typealias Node = FlowNode<InnerNode>
-    typealias Edge = OrderedPair<Node>
+    public typealias Node = FlowNode<InnerNode>
+    public typealias Edge = OrderedPair<Node>
     
-    let contains: (Edge) -> Bool
+    public let contains: (Edge) -> Bool
 }
 
 extension NetworkScheme {
-    init(_ contains: @escaping (Edge) -> Bool) {
+    public init(_ contains: @escaping (Edge) -> Bool) {
         self.contains = contains
     }
 }
 
 extension NetworkScheme {
-    func containsEdge(from start: FlowNode<InnerNode>, to end: FlowNode<InnerNode>) -> Bool {
+    public func containsEdge(from start: FlowNode<InnerNode>, to end: FlowNode<InnerNode>) -> Bool {
         return contains(Edge(start, end))
     }
 }

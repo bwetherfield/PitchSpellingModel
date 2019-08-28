@@ -39,7 +39,7 @@ extension WeightedGraphSchemeProtocol {
     
     /// - Returns: rhs weight function whenever the lhs is missing the edge in question.
     /// This function is non-commutative.
-    static func + (lhs: Self, rhs: Self) -> Self {
+    public static func + (lhs: Self, rhs: Self) -> Self {
         return Self { edge in
             lhs.weight(edge) ?? rhs.weight(edge)
         }

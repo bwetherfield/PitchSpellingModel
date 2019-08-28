@@ -7,10 +7,17 @@
 
 import GraphSchemes
 
-protocol UnweightedNetworkSchemeProtocol: NetworkSchemeProtocol, UnweightedGraphSchemeProtocol { }
+public protocol UnweightedNetworkSchemeProtocol: NetworkSchemeProtocol, UnweightedGraphSchemeProtocol { }
 
 extension UnweightedNetworkSchemeProtocol {
-    func pullback<H>(_ f: @escaping (H.InnerNode) -> InnerNode) -> H where H: UnweightedNetworkSchemeProtocol {
+    public func pullback<H>(_ f: @escaping (H.InnerNode) -> InnerNode) -> H where H: UnweightedNetworkSchemeProtocol {
         return pullback(bind(f))
+    }
+}
+
+extension UnweightedNetworkSchemeProtocol {
+    
+    public static func + (lhs: Self, rhs: Self) -> Self {
+        return Self { edge in lhs.contains(edge) || rhs.contains(edge) }
     }
 }
