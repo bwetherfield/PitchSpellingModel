@@ -323,15 +323,15 @@ private let sameIntsScheme: NetworkScheme<UnassignedInnerNode> =
         }
     }.pullback { node in node.index.b }
 
-//
-///// Adjacency scheme that connects `.source` to `.down` tendencies and not pitch class `8`
-//private let sourceEdgeLookupScheme: DirectedGraphScheme<FlowNode<Cross<Pitch.Class, Tendency>>> =
-//    DirectedGraphScheme<FlowNode<Pitch.Class>> { edge in
-//        edge.a == .source && edge.b != .internal(8)
-//        }.pullback(bind({ cross in cross.a }))
-//        * DirectedGraphScheme<FlowNode<Tendency>> { edge in
-//            edge.a == .source && edge.b == .internal(.down)
-//            }.pullback(bind ({ cross in cross.b }))
+
+/// Adjacency scheme that connects `.source` to `.down` tendencies and not pitch class `8`
+private let sourceEdgeLookupScheme: NetworkScheme<Cross<Pitch.Class, Tendency>> =
+    NetworkScheme<Pitch.Class> { edge in
+        edge.a == .source && edge.b != .internal(8)
+        }.pullback { cross in cross.a }
+    * NetworkScheme<Tendency> { edge in
+        edge.a == .source && edge.b == .internal(.down)
+        }.pullback { cross in cross.b }
 //
 ///// Adjacency scheme that connects `.up` tendencies and not pitch class `8` to `.sink`
 //private let sinkEdgeLookupScheme: DirectedGraphScheme<FlowNode<Cross<Pitch.Class, Tendency>>> =
