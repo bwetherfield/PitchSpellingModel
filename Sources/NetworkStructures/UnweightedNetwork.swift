@@ -10,6 +10,8 @@ public struct UnweightedNetwork<InnerNode: Hashable> {
     
     public var adjacencies: [Node: Set<Node>] = [.source: [], .sink: []]
     private var reverseAdjacencies: [Node: [Node]] = [.source: [], .sink: []]
+    
+    public init() {}
 }
 
 extension UnweightedNetwork {
@@ -18,26 +20,26 @@ extension UnweightedNetwork {
         adjacencies[start]!.remove(end)
     }
     
-    mutating func insert(_ node: InnerNode) {
+    public mutating func insert(_ node: InnerNode) {
         insert(.internal(node))
     }
     
-    mutating func insert(_ node: Node) {
+    public mutating func insert(_ node: Node) {
         if !adjacencies.keys.contains(node) {
             adjacencies[node] = []
             reverseAdjacencies[node] = []
         }
     }
     
-    mutating func internalEdge(from start: InnerNode, to end: InnerNode) {
+    public mutating func internalEdge(from start: InnerNode, to end: InnerNode) {
         edge(from: .internal(start), to: .internal(end))
     }
     
-    mutating func sourceEdge(to end: InnerNode) {
+    public mutating func sourceEdge(to end: InnerNode) {
         edge(from: .source, to: .internal(end))
     }
     
-    mutating func sinkEdge(from start: InnerNode) {
+    public mutating func sinkEdge(from start: InnerNode) {
         edge(from: .internal(start), to: .sink)
     }
     

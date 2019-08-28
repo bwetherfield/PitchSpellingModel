@@ -417,46 +417,24 @@ private let upDownEdgeLookup: Set<UnorderedPair<Pitch.Class>> = [
     .init(10, 11)
 ]
 
-//extension DirectedGraph where Node == PitchSpeller.AssignedNode {
-//
-//    // MARK: - Initializers
-//
-//    /// Create a `DirectedGraph` which is hooked up as neccesary for the Wetherfield inverse-spelling
-//    /// process.
-//    init(internalNodes: [PitchSpeller.InternalAssignedNode]) {
-//        self.init()
-//        let source = PitchSpeller.AssignedNode(.source, .down)
-//        let sink = PitchSpeller.AssignedNode(.sink, .up)
-//        self.insert(source)
-//        self.insert(sink)
-//
-//        var mapInternal: (PitchSpeller.InternalAssignedNode) -> PitchSpeller.AssignedNode {
-//            return { .init(.internal($0.index), $0.assignment) }
-//        }
-//
-//        for internalNode in internalNodes {
-//            let node = mapInternal(internalNode)
-//            insert(node)
-//            insertEdge(from: source, to: node)
-//            insertEdge(from: node, to: sink)
-//            for otherInternalNode in internalNodes where otherInternalNode != internalNode {
-//                let other = mapInternal(otherInternalNode)
-//                insertEdge(from: node, to: other)
-//            }
-//        }
-//    }
-//
-//    // MARK: - Instance Methods
-//
-//    /// Lazily removes adjacencies from the `flowNetwork` according to `adjacencyScheme`
-//    mutating func mask <Scheme: UnweightedGraphSchemeProtocol> (_ adjacencyScheme: Scheme) where
-//        Scheme.Node == Node
-//    {
-//        for edge in edges where !adjacencyScheme.containsEdge(from: edge.a, to: edge.b) {
-//            remove(edge)
-//        }
-//    }
-//}
+extension UnweightedNetwork where InnerNode == AssignedInnerNode {
+
+    // MARK: - Initializers
+
+    /// Create a `DirectedGraph` which is hooked up as neccesary for the Wetherfield inverse-spelling
+    /// process.
+    init(internalNodes: [AssignedInnerNode]) {
+        self.init()
+        for node in internalNodes {
+            self.insert(node)
+            self.sourceEdge(to: node)
+            self.sinkEdge(from: node)
+            for other in internalNodes where other != node {
+                self.internalEdge(from: node, to: other)
+            }
+        }
+    }
+}
 
 /// - Returns: Index and assignment of all internal nodes of the `network`.
 private func internalNodes (spellings: [Int: Pitch.Spelling]) -> [AssignedInnerNode] {
