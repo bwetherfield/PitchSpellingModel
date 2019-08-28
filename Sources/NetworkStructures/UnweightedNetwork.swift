@@ -52,36 +52,6 @@ extension UnweightedNetwork {
 }
 
 extension UnweightedNetwork {
-    
-    public func augmentingPath() -> [Node]? {
-        var breadcrumbs: [Node: Node] = [:]
-        
-        func backtrace() -> [Node] {
-            var path = [Node.sink]
-            var cursor = Node.sink
-            while cursor != Node.source {
-                path.insert(breadcrumbs[cursor]!, at: 0)
-                cursor = breadcrumbs[cursor]!
-            }
-            return path
-        }
-        
-        var unvisited = Set(adjacencies.keys)
-        var queue = [Node.source]
-        while !queue.isEmpty {
-            let node = queue.removeFirst()
-            for neighbor in adjacencies[node]! where unvisited.contains(neighbor) {
-                queue.append(neighbor)
-                unvisited.remove(neighbor)
-                breadcrumbs[neighbor] = node
-                if neighbor == Node.sink { return backtrace() }
-            }
-        }
-        return nil
-    }
-}
-
-extension UnweightedNetwork {
     public mutating func mask (_ scheme: NetworkScheme<InnerNode>)
     {
         adjacencies.forEach { (node, neighbors) in
@@ -90,4 +60,16 @@ extension UnweightedNetwork {
             }
         }
     }
+}
+
+extension UnweightedNetwork: FlowNetworkProtocol {
+    public var nodes: Set<FlowNode<InnerNode>> {
+        return Set(adjacencies.keys)
+    }
+    
+    public func neighbors(of node: FlowNode<InnerNode>) -> [FlowNode<InnerNode>] {
+        return Array(adjacencies[node]!)
+    }
+    
+    
 }

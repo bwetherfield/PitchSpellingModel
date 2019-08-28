@@ -6,7 +6,8 @@
 //
 
 public struct FlowNetwork<InnerNode: Hashable> {
-    typealias Node = FlowNode<InnerNode>
+    
+    public typealias Node = FlowNode<InnerNode>
 
     private var weights: [Node: [Node: Double]] = [.source: [:], .sink: [:]]
     private var reverseAdjacencies: [Node: Set<Node>] = [.source: [], .sink: []]
@@ -123,3 +124,12 @@ extension FlowNetwork {
     }
 }
 
+extension FlowNetwork: FlowNetworkProtocol {
+    public var nodes: Set<FlowNode<InnerNode>> {
+        return Set(weights.keys)
+    }
+    
+    public func neighbors(of node: Node) -> [Node] {
+        return Array(weights[node]!.keys)
+    }
+}
