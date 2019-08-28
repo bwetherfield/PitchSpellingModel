@@ -59,6 +59,29 @@ extension FlowNetwork {
 
 extension FlowNetwork {
     
+    mutating func mask (_ scheme: NetworkScheme<InnerNode>) {
+        weights.forEach { (node, neighbors) in
+            neighbors.keys.forEach { neighbor in
+                if !scheme.containsEdge(from: node, to: neighbor) { weights[node]![neighbor] = nil }
+            }
+        }
+    }
+    
+    mutating func mask (_ weightScheme: FlowNetworkScheme<InnerNode>) {
+        weights.forEach { (node, neighbors) in
+            neighbors.keys.forEach { neighbor in
+                if let weight = weightScheme.weight(from: node, to: neighbor) {
+                    weights[node]![neighbor]! *= weight
+                } else {
+                    weights[node]![neighbor] = nil
+                }
+            }
+        }
+    }
+}
+
+extension FlowNetwork {
+    
     // MARK: - Mutating Methods
     
     mutating func reduceFlow(from start: Node, to end: Node, by amount: Double) {
