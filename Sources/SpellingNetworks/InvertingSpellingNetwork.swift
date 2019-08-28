@@ -457,22 +457,22 @@ private let upDownEdgeLookup: Set<UnorderedPair<Pitch.Class>> = [
 //        }
 //    }
 //}
-//
-///// - Returns: Index and assignment of all internal nodes of the `flowNetwork`.
-//private func internalNodes (spellings: [Int: Pitch.Spelling]) -> [PitchSpeller.InternalAssignedNode] {
-//    return spellings
-//        .map { offset, spelling in [.down,.up].map { index in node(offset, index, spelling) } }
-//        .reduce([], +)
-//}
-//
-///// - Returns: The value of a node at the given offset (index of a `Pitch.Spelling` within `spellings`),
-///// and an index (either `0` or `1`, which of the two nodes in the `FlowNetwork` that represent
-///// the given `Pitch.Spelling`.)
-//private func node (_ offset: Int, _ index: Tendency, _ pitchSpelling: Pitch.Spelling)
-//    -> PitchSpeller.InternalAssignedNode
-//{
-//    let pitchCategory = Pitch.Spelling.Category.category(for: pitchSpelling.pitchClass)!
-//    let direction = pitchCategory.directionToModifier[value: pitchSpelling.modifier]!
-//    let tendencies = pitchCategory.tendenciesToDirection[value: direction]!
-//    return .init(.init(offset, index), index == .up ? tendencies.a : tendencies.b)
-//}
+
+/// - Returns: Index and assignment of all internal nodes of the `network`.
+private func internalNodes (spellings: [Int: Pitch.Spelling]) -> [AssignedInnerNode] {
+    return spellings
+        .map { offset, spelling in [.down,.up].map { index in node(offset, index, spelling) } }
+        .reduce([], +)
+}
+
+/// - Returns: The value of a node at the given offset (index of a `Pitch.Spelling` within `spellings`),
+/// and an index (either `0` or `1`, which of the two nodes in the `FlowNetwork` that represent
+/// the given `Pitch.Spelling`.)
+private func node (_ offset: Int, _ index: Tendency, _ pitchSpelling: Pitch.Spelling)
+    -> AssignedInnerNode
+{
+    let pitchCategory = Pitch.Spelling.Category.category(for: pitchSpelling.pitchClass)!
+    let direction = pitchCategory.directionToModifier[value: pitchSpelling.modifier]!
+    let tendencies = pitchCategory.tendenciesToDirection[value: direction]!
+    return .init(index: .init(offset, index), assignment: index == .up ? tendencies.a : tendencies.b)
+}

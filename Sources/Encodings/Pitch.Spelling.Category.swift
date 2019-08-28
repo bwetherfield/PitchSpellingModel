@@ -11,7 +11,7 @@ import Pitch
 import SpelledPitch
 
 /// Interface for the six pitch spelling categories.
-protocol PitchSpellingCategoryProtocol: TendencyConverting {
+public protocol PitchSpellingCategoryProtocol: TendencyConverting {
     typealias ModifierLookup = Bimap<ModifierDirection,Pitch.Spelling.Modifier>
     /// The available `Pitch.Spelling.Modifier` value by the given `ModifierDirection`.
     static var directionToModifier: ModifierLookup { get }
@@ -20,7 +20,7 @@ protocol PitchSpellingCategoryProtocol: TendencyConverting {
 extension Pitch.Spelling {
 
     /// Namespace for `PitchSpellingCategoryProtocol` types.
-    enum Category {
+    public enum Category {
 
         /// Category for pitch classes `0` and `5`.
         struct Zero: PitchSpellingCategoryProtocol {
@@ -81,7 +81,7 @@ extension Pitch.Spelling {
         // TODO: The proposal for static subscripts was accepted:
         // https://github.com/apple/swift-evolution/blob/master/proposals/0254-static-subscripts.md
         // This would be a nice use case for that.
-        static func category(for pitchClass: Pitch.Class) -> PitchSpellingCategoryProtocol.Type? {
+        public static func category(for pitchClass: Pitch.Class) -> PitchSpellingCategoryProtocol.Type? {
             switch pitchClass {
             case 0,5: return Zero.self
             case 1,6: return One.self

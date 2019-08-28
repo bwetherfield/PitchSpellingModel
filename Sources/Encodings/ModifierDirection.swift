@@ -7,7 +7,7 @@
 
 /// The possible directions of `QuarterStepModifier` values within the context of
 /// a `PitchSpellingCategoryProtocol`.
-enum ModifierDirection: Hashable {
+public enum ModifierDirection: Hashable {
     case down
     case neutral
     case up

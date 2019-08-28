@@ -9,7 +9,7 @@ import DataStructures
 import Pitch
 import SpelledPitch
 
-typealias TendencyPair = OrderedPair<Tendency>
+public typealias TendencyPair = OrderedPair<Tendency>
 
 /// One of two values encoded in a Wetherfield `FlowNetwork`. Each provides a tendency `up`, or
 /// `down` for the purposes of spelling an unspelled pitch in a given musical context.

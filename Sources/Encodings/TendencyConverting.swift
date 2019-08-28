@@ -11,7 +11,7 @@ import SpelledPitch
 
 /// Interface for `PitchSpellingCategoryProtocol` types which can convert a `TendencyPair` into a
 /// `ModifierDirection`.
-protocol TendencyConverting {
+public protocol TendencyConverting {
     typealias DirectionLookup = Bimap<TendencyPair,ModifierDirection>
     static var tendenciesToDirection: DirectionLookup { get }
 }
