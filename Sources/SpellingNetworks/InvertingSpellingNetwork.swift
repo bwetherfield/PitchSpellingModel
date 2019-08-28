@@ -379,21 +379,21 @@ private let upDownEdgeScheme: NetworkScheme<Cross<Pitch.Class, Tendency>> =
         }
     }
 
-///// Adjacency scheme that connects nodes with the same tendency provided the pitch classes of the nodes
-///// are *not* connected per `upDownEdgeLookup`
-//private let sameEdgeScheme: DirectedGraphScheme<FlowNode<Cross<Pitch.Class, Tendency>>> =
-//    GraphScheme { edge in
-//        switch (edge.a, edge.b) {
-//        case (.internal(let source), .internal(let destination)):
-//            return (
-//                source.b == destination.b &&
-//                    !upDownEdgeLookup.contains(.init(source.a, destination.a))
-//            )
-//        default:
-//            return false
-//        }
-//        }.directed
-//
+/// Adjacency scheme that connects nodes with the same tendency provided the pitch classes of the nodes
+/// are *not* connected per `upDownEdgeLookup`
+private let sameEdgeScheme: NetworkScheme<Cross<Pitch.Class, Tendency>> =
+    NetworkScheme { edge in
+        switch (edge.a, edge.b) {
+        case (.internal(let source), .internal(let destination)):
+            return (
+                source.b == destination.b
+                    && !upDownEdgeLookup.contains(.init(source.a, destination.a))
+            )
+        default:
+            return false
+        }
+    }
+
 /// Pairs of pitch classes that have a different skew, such that `ModifierDirection.neutral` for one node is
 /// sharp or 'up' in absolute terms and for the other node it is down
 private let upDownEdgeLookup: Set<UnorderedPair<Pitch.Class>> = [
