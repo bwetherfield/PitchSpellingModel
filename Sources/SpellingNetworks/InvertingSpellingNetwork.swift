@@ -312,10 +312,16 @@ extension InvertingSpellingNetwork {
 //    }
 //}
 //
-///// Adjacency scheme that connects `.up` tendencies to `.down` tendencies
-//private let sameIntsScheme: DirectedGraphScheme<PitchSpeller.UnassignedNode> =
-//    DirectedGraphScheme<Tendency?> { edge in edge.a == .up && edge.b == .down }
-//        .pullback { node in node.index.tendency}
+/// Adjacency scheme that connects `.up` tendencies to `.down` tendencies
+private let sameIntsScheme: NetworkScheme<UnassignedInnerNode> =
+    NetworkScheme<Tendency> { edge in
+        switch (edge.a, edge.b) {
+        case let (.internal(a), .internal(b)):
+            return a == .up && b == .down
+        default:
+            return false
+        }}.pullback { node in node.index.b }
+
 //
 ///// Adjacency scheme that connects `.source` to `.down` tendencies and not pitch class `8`
 //private let sourceEdgeLookupScheme: DirectedGraphScheme<FlowNode<Cross<Pitch.Class, Tendency>>> =
