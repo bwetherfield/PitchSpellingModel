@@ -332,16 +332,16 @@ private let sourceEdgeLookupScheme: NetworkScheme<Cross<Pitch.Class, Tendency>> 
     * NetworkScheme<Tendency> { edge in
         edge.a == .source && edge.b == .internal(.down)
         }.pullback { cross in cross.b }
-//
-///// Adjacency scheme that connects `.up` tendencies and not pitch class `8` to `.sink`
-//private let sinkEdgeLookupScheme: DirectedGraphScheme<FlowNode<Cross<Pitch.Class, Tendency>>> =
-//    DirectedGraphScheme<FlowNode<Pitch.Class>> { edge in
-//        edge.a != .internal(8) && edge.b == .sink
-//        }.pullback(bind({ cross in cross.a }))
-//        * DirectedGraphScheme<FlowNode<Tendency>> { edge in
-//            edge.a == .internal(.up) && edge.b == .sink
-//            }.pullback(bind ({ cross in cross.b }))
-//
+
+/// Adjacency scheme that connects `.up` tendencies and not pitch class `8` to `.sink`
+private let sinkEdgeLookupScheme: NetworkScheme<Cross<Pitch.Class, Tendency>> =
+    NetworkScheme<Pitch.Class> { edge in
+        edge.a != .internal(8) && edge.b == .sink
+        }.pullback { cross in cross.a }
+    * NetworkScheme<Tendency> { edge in
+        edge.a == .internal(.up) && edge.b == .sink
+        }.pullback { cross in cross.b }
+
 /// Adjacency scheme that connects nodes with the same `int` value
 private let connectSameInts: NetworkScheme<UnassignedInnerNode> =
     NetworkScheme<Int> { edge in
