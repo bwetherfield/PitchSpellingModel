@@ -6,7 +6,6 @@
 //
 
 import DataStructures
-import GraphSchemes
 
 public struct NetworkScheme<InnerNode: Hashable>: UnweightedNetworkSchemeProtocol {
     

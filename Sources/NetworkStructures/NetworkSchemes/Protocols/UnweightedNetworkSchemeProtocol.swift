@@ -5,8 +5,6 @@
 //  Created by Benjamin Wetherfield on 8/28/19.
 //
 
-import GraphSchemes
-
 public protocol UnweightedNetworkSchemeProtocol: NetworkSchemeProtocol, UnweightedGraphSchemeProtocol { }
 
 extension UnweightedNetworkSchemeProtocol {

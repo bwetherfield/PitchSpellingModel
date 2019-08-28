@@ -6,7 +6,6 @@
 //
 
 import DataStructures
-import GraphSchemes
 
 struct FlowNetworkScheme<InnerNode: Hashable>: NetworkSchemeProtocol, WeightedGraphSchemeProtocol {
     typealias Node = FlowNode<InnerNode>
