@@ -36,7 +36,7 @@ let package = Package(
             dependencies: []),
         .target(
             name: "GraphSchemes",
-            dependencies: []),
+            dependencies: ["DataStructures"]),
         .target(
             name: "NetworkStructures",
             dependencies: ["DataStructures", "GraphSchemes"]),
