@@ -25,26 +25,6 @@ extension InvertingSpellingNetwork {
     public typealias PitchedEdge = UnorderedPair<PitchedNode>
 }
 
-//public struct SpellingInverter {
-//
-//    // MARK: - Instance Properties
-//
-//    // The pre-assigned `DirectedGraph` which stands in for the `FlowNetwork` that
-//    // would solve to the set of spellings passed into the `SpellingInverter`.
-//    var flowNetwork: DirectedGraph<PitchSpeller.AssignedNode>
-//
-//    let pitchClass: (Int) -> Pitch.Class?
-//}
-//
-//extension SpellingInverter {
-//
-//    // MARK: - Type Aliases
-//
-//    typealias AssignedEdge = OrderedPair<PitchSpeller.AssignedNode>
-//    typealias UnassignedEdge = OrderedPair<PitchSpeller.UnassignedNode>
-//    public typealias PitchedEdge = UnorderedPair<FlowNode<Cross<Pitch.Class,Tendency>>>
-//}
-//
 //extension SpellingInverter {
 //
 //    // MARK: - Initializers
@@ -238,32 +218,7 @@ extension InvertingSpellingNetwork {
         network.mask(mask)
     }
 }
-//
-//extension SpellingInverter {
-//
-//    // MARK: - Instance Methods
-//
-//    mutating func partition (via indices: [Int: Int]) {
-//        let adjacencyScheme = GraphScheme<FlowNode<Int>> { edge in
-//            switch (edge.a, edge.b) {
-//            case let (.internal(a), .internal(b)):
-//                return indices[a] == indices[b]
-//            default:
-//                return true
-//            }
-//        }
-//        connect(via: adjacencyScheme)
-//    }
-//
-//    mutating func connect (via adjacencyScheme: GraphScheme<FlowNode<Int>>) {
-//        let temp: GraphScheme<FlowNode<Cross<Int, Tendency>>>
-//            = (adjacencyScheme + GraphScheme<FlowNode<Int>> { edge in
-//                edge.a == edge.b
-//                }).pullback(bind { cross in cross.a})
-//        let mask: GraphScheme<PitchSpeller.AssignedNode> = temp.pullback { node in node.index }
-//        flowNetwork.mask(mask)
-//    }
-//}
+
 //
 //extension SpellingInverter {
 //
