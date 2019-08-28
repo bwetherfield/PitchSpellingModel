@@ -8,7 +8,7 @@
 import DataStructures
 import GraphSchemes
 
-struct NetworkScheme<InnerNode: Hashable>: NetworkSchemeProtocol, UnweightedGraphSchemeProtocol {
+struct NetworkScheme<InnerNode: Hashable>: UnweightedNetworkSchemeProtocol{
     
     typealias Node = FlowNode<InnerNode>
     typealias Edge = OrderedPair<Node>
@@ -19,13 +19,6 @@ struct NetworkScheme<InnerNode: Hashable>: NetworkSchemeProtocol, UnweightedGrap
 extension NetworkScheme {
     init(_ contains: @escaping (Edge) -> Bool) {
         self.contains = contains
-    }
-}
-
-extension NetworkScheme {
-    func pullback<BackInnerNode>(_ innerLens: @escaping (BackInnerNode) -> InnerNode)
-        -> NetworkScheme<BackInnerNode> {
-            return self.pullback(bind(innerLens))
     }
 }
 
