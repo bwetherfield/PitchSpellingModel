@@ -8,7 +8,7 @@
 struct FlowNetwork<InnerNode: Hashable> {
     typealias Node = FlowNode<InnerNode>
 
-    private var weights: [Node: [(Node, Double)]] = [.source: [], .sink: []]
+    private var weights: [Node: [Node: Double]] = [.source: [:], .sink: [:]]
     private var reverseAdjacencies: [Node: [Node]] = [.source: [], .sink: []]
 }
 
@@ -19,7 +19,7 @@ extension FlowNetwork {
     
     mutating func insert(_ node: Node) {
         if !weights.keys.contains(node) {
-            weights[node] = []
+            weights[node] = [:]
             reverseAdjacencies[node] = []
         }
     }
@@ -39,7 +39,7 @@ extension FlowNetwork {
     private mutating func _insertEdge(from start: Node, to end: Node, withWeight weight: Double) {
         insert(start)
         insert(end)
-        weights[start]!.append((end, weight))
+        weights[start]![end] = weight
         reverseAdjacencies[end]!.append(start)
     }
 }
