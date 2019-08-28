@@ -320,7 +320,8 @@ private let sameIntsScheme: NetworkScheme<UnassignedInnerNode> =
             return a == .up && b == .down
         default:
             return false
-        }}.pullback { node in node.index.b }
+        }
+    }.pullback { node in node.index.b }
 
 //
 ///// Adjacency scheme that connects `.source` to `.down` tendencies and not pitch class `8`
@@ -341,9 +342,16 @@ private let sameIntsScheme: NetworkScheme<UnassignedInnerNode> =
 //            edge.a == .internal(.up) && edge.b == .sink
 //            }.pullback(bind ({ cross in cross.b }))
 //
-///// Adjacency scheme that connects nodes with the same `int` value
-//private let connectSameInts: GraphScheme<PitchSpeller.UnassignedNode> =
-//    GraphScheme<Int> { edge in edge.a == edge.b }.pullback { node in node.index.int! }
+/// Adjacency scheme that connects nodes with the same `int` value
+private let connectSameInts: NetworkScheme<UnassignedInnerNode> =
+    NetworkScheme<Int> { edge in
+        switch (edge.a, edge.b) {
+        case let (.internal(a), .internal(b)):
+            return a == b
+        default:
+            return false
+        }
+    }.pullback { node in node.index.a }
 //
 ///// Adjacency scheme that connects nodes with different `int` values
 //private let connectDifferentInts: GraphScheme<PitchSpeller.UnassignedNode> =
