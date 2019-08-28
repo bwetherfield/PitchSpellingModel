@@ -33,7 +33,7 @@ let package = Package(
             dependencies: []),
         .target(
             name: "NetworkStructures",
-            dependencies: []),
+            dependencies: ["DataStructures"]),
         .target(
             name: "Encodings",
             dependencies: ["Pitch", "SpelledPitch", "DataStructures"]),
