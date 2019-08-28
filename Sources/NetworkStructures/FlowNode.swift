@@ -11,7 +11,7 @@ public enum FlowNode<Index>: Hashable where Index: Hashable {
     case sink
 }
 
-func bind <S: Hashable, A: Hashable> (_ f: @escaping (S) -> A) -> (FlowNode<S>) -> FlowNode<A> {
+public func bind <S: Hashable, A: Hashable> (_ f: @escaping (S) -> A) -> (FlowNode<S>) -> FlowNode<A> {
     return { flowNodeS in
         switch flowNodeS {
         case .internal(let index): return .internal(f(index))
