@@ -9,7 +9,7 @@ public struct FlowNetwork<InnerNode: Hashable> {
     typealias Node = FlowNode<InnerNode>
 
     private var weights: [Node: [Node: Double]] = [.source: [:], .sink: [:]]
-    private var reverseAdjacencies: [Node: [Node]] = [.source: [], .sink: []]
+    private var reverseAdjacencies: [Node: Set<Node>] = [.source: [], .sink: []]
 }
 
 extension FlowNetwork {
@@ -25,21 +25,78 @@ extension FlowNetwork {
     }
     
     mutating func edge(from start: InnerNode, to end: InnerNode, withWeight weight: Double) {
-        _insertEdge(from: .internal(start), to: .internal(end), withWeight: weight)
+        insertEdge(from: .internal(start), to: .internal(end), withWeight: weight)
     }
     
     mutating func sourceEdge(to end: InnerNode, withWeight weight: Double) {
-        _insertEdge(from: .source, to: .internal(end), withWeight: weight)
+        insertEdge(from: .source, to: .internal(end), withWeight: weight)
     }
     
     mutating func sinkEdge(from start: InnerNode, withWeight weight: Double) {
-        _insertEdge(from: .internal(start), to: .sink, withWeight: weight)
+        insertEdge(from: .internal(start), to: .sink, withWeight: weight)
     }
     
-    private mutating func _insertEdge(from start: Node, to end: Node, withWeight weight: Double) {
+    mutating func insertEdge(from start: Node, to end: Node, withWeight weight: Double) {
         insert(start)
         insert(end)
         weights[start]![end] = weight
-        reverseAdjacencies[end]!.append(start)
+        reverseAdjacencies[end]!.insert(start)
+    }
+    
+    mutating func removeEdge(from start: Node, to end: Node) {
+        weights[start]![end] = nil
+        reverseAdjacencies[end]!.remove(start)
+        if start != .sink && start != .source {
+            if weights[start]!.isEmpty { weights[start] = nil }
+            if reverseAdjacencies[start]!.isEmpty { reverseAdjacencies[start] = nil }
+        }
+        if end != .sink && end != .source {
+            if weights[end]!.isEmpty { weights[end] = nil }
+            if reverseAdjacencies[end]!.isEmpty { reverseAdjacencies[end] = nil }
+        }
     }
 }
+
+extension FlowNetwork {
+    
+    // MARK: - Mutating Methods
+    
+    mutating func reduceFlow(from start: Node, to end: Node, by amount: Double) {
+        weights[start]![end]! -= amount
+    }
+
+    /// Removes the given edge if its weight is `0`. This happens after an edge, which has the
+    /// minimum flow of an augmenting path, is reduced by the minimum flow (which is its previous
+    /// value).
+    mutating func removeEdgeIfFlowless(from start: Node, to end: Node) {
+        if weights[start]![end]! == 0 {
+            removeEdge(from: start, to: end)
+        }
+    }
+
+    /// Inserts an edge in the opposite direction of the given `edge` with the minimum flow
+    mutating func updateBackEdge(from start: Node, to end: Node, by minimumFlow: Double) {
+        if weights[end]!.keys.contains(start) {
+            weights[end]![start]! += minimumFlow
+        } else {
+            insertEdge(from: end, to: start, withWeight: minimumFlow)
+        }
+    }
+
+    /// Reduces the flow of the given `edge` by the given `minimumFlow`. If the new flow through
+    /// the `edge` is now `0`, removes the `edge` from the network. Updates the reverse of the given
+    /// `edge` by the given `minimumFlow`.
+    mutating func pushFlow(from start: Node, to end: Node, by minimumFlow: Double) {
+        reduceFlow(from: start, to: end, by: minimumFlow)
+        removeEdgeIfFlowless(from: start, to: end)
+        updateBackEdge(from: start, to: end, by: minimumFlow)
+    }
+
+    /// Pushes flow through the given `path` in this `graph`.
+    mutating func pushFlow(through path: [Node]) {
+        let pairs = path.pairs
+        let minimumFlow = pairs.map { weights[$0.0]![$0.1]! }.min() ?? 0
+        pairs.forEach { pushFlow(from: $0.0, to: $0.1, by: minimumFlow) }
+    }
+}
+
