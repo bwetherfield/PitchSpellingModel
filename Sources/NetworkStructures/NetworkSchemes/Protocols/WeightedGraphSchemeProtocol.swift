@@ -25,12 +25,4 @@ extension WeightedGraphSchemeProtocol {
     {
         return H { self.weight(from: f($0.a), to: f($0.b)) }
     }
-
-    @inlinable
-    func unweighted <H> () -> H where
-        H: UnweightedGraphSchemeProtocol,
-        H.Edge == Edge
-    {
-        return H { self.weight($0) != nil }
-    }
 }
