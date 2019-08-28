@@ -6,13 +6,18 @@
 //
 
 public struct UnweightedNetwork<InnerNode: Hashable> {
-    typealias Node = FlowNode<InnerNode>
+    public typealias Node = FlowNode<InnerNode>
     
-    private var adjacencies: [Node: Set<Node>] = [.source: [], .sink: []]
+    public var adjacencies: [Node: Set<Node>] = [.source: [], .sink: []]
     private var reverseAdjacencies: [Node: [Node]] = [.source: [], .sink: []]
 }
 
 extension UnweightedNetwork {
+    
+    public mutating func removeEdge(from start: Node, to end: Node) {
+        adjacencies[start]!.remove(end)
+    }
+    
     mutating func insert(_ node: InnerNode) {
         insert(.internal(node))
     }
@@ -24,19 +29,19 @@ extension UnweightedNetwork {
         }
     }
     
-    mutating func edge(from start: InnerNode, to end: InnerNode) {
-        _insertEdge(from: .internal(start), to: .internal(end))
+    mutating func internalEdge(from start: InnerNode, to end: InnerNode) {
+        edge(from: .internal(start), to: .internal(end))
     }
     
     mutating func sourceEdge(to end: InnerNode) {
-        _insertEdge(from: .source, to: .internal(end))
+        edge(from: .source, to: .internal(end))
     }
     
     mutating func sinkEdge(from start: InnerNode) {
-        _insertEdge(from: .internal(start), to: .sink)
+        edge(from: .internal(start), to: .sink)
     }
     
-    private mutating func _insertEdge(from start: Node, to end: Node) {
+    public mutating func edge(from start: Node, to end: Node) {
         insert(start)
         insert(end)
         adjacencies[start]!.insert(end)
@@ -46,7 +51,7 @@ extension UnweightedNetwork {
 
 extension UnweightedNetwork {
     
-    private func augmentingPath() -> [Node] {
+    public func augmentingPath() -> [Node]? {
         var breadcrumbs: [Node: Node] = [:]
         
         func backtrace() -> [Node] {
@@ -70,6 +75,6 @@ extension UnweightedNetwork {
                 if neighbor == Node.sink { return backtrace() }
             }
         }
-        return []
+        return nil
     }
 }

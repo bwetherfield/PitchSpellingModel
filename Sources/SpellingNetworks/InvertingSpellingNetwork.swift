@@ -105,136 +105,117 @@ extension InvertingSpellingNetwork {
 //    }
 //}
 //
-//extension SpellingInverter {
-//
-//    // MARK: - Computed Properties
-//
-//    /// - Returns: A concrete distribution of weights to satisfy the weight relationships delimited by
-//    /// `weightDependencies` or `nil` if no such distribution is possible, i.e. there are cyclical
-//    /// dependencies between edge types. In the latter case, the spellings fed in are *inconsistent*.
-//    /// Weights are parametrized by `Pitch.Class` and `Tendency` values.
-//    public func generateWeights () -> [PitchedEdge: Double] {
-//        let pitchedDependencies = findDependencies()
-//        if pitchedDependencies.containsCycle() {
-//            return generateWeightsFromCycles(pitchedDependencies)
-//        }
-//        func dependeciesReducer (
-//            _ weights: inout [PitchedEdge: Double],
-//            _ dependency: (key: PitchedEdge, value: Set<PitchedEdge>)
-//            )
-//        {
-//            func recursiveReducer (
-//                _ weights: inout [PitchedEdge: Double],
-//                _ dependency: (key: PitchedEdge, value: Set<PitchedEdge>)
-//                ) -> Double
-//            {
-//                let weight = dependency.value.reduce(1.0) { result, edge in
-//                    if let edgeWeight = weights[edge] { return result + edgeWeight }
-//                    return (
-//                        result +
-//                            recursiveReducer(&weights, (key: edge, value: pitchedDependencies.adjacencies[edge]!))
-//                    )
-//                }
-//                weights[dependency.key] = weight
-//                return weight
-//            }
-//            let _ = recursiveReducer(&weights, dependency)
-//        }
-//        return pitchedDependencies.adjacencies.reduce(into: [:], dependeciesReducer)
-//    }
-//
-//    func generateWeightsFromCycles (_ dependencies: AdjacencyList<PitchedEdge>)
-//        -> [PitchedEdge: Double] {
-//            let directedAcyclicGraph = dependencies.DAGify()
-//            let groupedWeights: [Set<PitchedEdge>: Double] = generateWeights(from: directedAcyclicGraph)
-//            return groupedWeights.reduce(into: [PitchedEdge: Double]()) { runningWeights, pair in
-//                pair.key.forEach { pitchedEdge in
-//                    runningWeights[pitchedEdge] = pair.value
-//                }
-//            }
-//    }
-//
-//    func generateWeights<Node> (from dependencies: AdjacencyList<Node>) -> [Node: Double] {
-//        func dependeciesReducer (
-//            _ weights: inout [Node: Double],
-//            _ dependency: (key: Node, value: Set<Node>)
-//            )
-//        {
-//            func recursiveReducer (
-//                _ weights: inout [Node: Double],
-//                _ dependency: (key: Node, value: Set<Node>)
-//                ) -> Double
-//            {
-//                let weight = dependency.value.reduce(1.0) { result, edge in
-//                    if weights[edge] != nil { return result + weights[edge]! }
-//                    return (
-//                        result +
-//                            recursiveReducer(&weights, (key: edge, value: dependencies.adjacencies[edge]!))
-//                    )
-//                }
-//                weights[dependency.key] = weight
-//                return weight
-//            }
-//            let _ = recursiveReducer(&weights, dependency)
-//        }
-//        return dependencies.adjacencies.reduce(into: [:], dependeciesReducer)
-//    }
-//
-//    /// - Returns: getter for the pitched version of a node index
-//    var pitchClassMapper: (Cross<Int,Tendency>) -> Cross<Pitch.Class, Tendency> {
-//        return { input in
-//            Cross<Pitch.Class, Tendency>(self.pitchClass(input.a)!, input.b)
-//        }
-//    }
-//
-//    /// - Returns: getter for the `FlowNode` version of `pitchClassMapper`
-//    var flowNodeMapper: (FlowNode<Cross<Int,Tendency>>) -> FlowNode<Cross<Pitch.Class,Tendency>> {
-//        return bind(pitchClassMapper)
-//    }
-//
-//    /// - Returns: getter from a `PitchSpeller.UnassignedNode` to a flow network pitched node
-//    var nodeMapper: (PitchSpeller.UnassignedNode) -> FlowNode<Cross<Pitch.Class,Tendency>> {
-//        return { self.flowNodeMapper($0.index) }
-//    }
-//
-//    /// - Returns: getter from an `UnassignedEdge` to a `PitchedEdge`
-//    var pairMapper: (UnassignedEdge) -> PitchedEdge {
-//        return { pair in
-//            .init(self.nodeMapper(pair.a), self.nodeMapper(pair.b))
-//        }
-//    }
-//
-//    /// - Returns: For each `Edge`, a `Set` of `Edge` values, the sum of whose weights the edge's weight
-//    /// must be greater than for the inverse spelling procedure to be valid.
-//    func findDependencies () -> AdjacencyList<PitchedEdge> {
-//        var residualNetwork = flowNetwork
-//        var weightDependencies: [PitchedEdge: Set<PitchedEdge>] = flowNetwork.edges.lazy
-//            .map { .init(self.nodeMapper($0.a.unassigned), self.nodeMapper($0.b.unassigned)) }
-//            .reduce(into: [:]) { dependencies, edge in dependencies[edge] = [] }
-//        let source = PitchSpeller.AssignedNode(.source, .down)
-//        let sink = PitchSpeller.AssignedNode(.sink, .up)
-//        while let augmentingPath = residualNetwork.shortestUnweightedPath(from: source, to: sink) {
-//            let preCutIndex = augmentingPath.lastIndex { $0.assignment == .down }!
-//            let cutEdge = AssignedEdge(augmentingPath[preCutIndex], augmentingPath[preCutIndex+1])
-//            for edge in augmentingPath.pairs.map(AssignedEdge.init) where edge != cutEdge {
-//                weightDependencies[
-//                    PitchedEdge(
-//                        self.nodeMapper(edge.a.unassigned),
-//                        self.nodeMapper(edge.b.unassigned)
-//                    )
-//                    ]!.insert(
-//                        PitchedEdge(
-//                            self.nodeMapper(cutEdge.a.unassigned),
-//                            self.nodeMapper(cutEdge.b.unassigned)
-//                        )
-//                )
-//            }
-//            residualNetwork.remove(cutEdge)
-//            residualNetwork.insertEdge(from: cutEdge.b, to: cutEdge.a)
-//        }
-//        return AdjacencyList(weightDependencies)
-//    }
-//}
+extension InvertingSpellingNetwork {
+
+    /// - Returns: A concrete distribution of weights to satisfy the weight relationships delimited by
+    /// `weightDependencies` or `nil` if no such distribution is possible, i.e. there are cyclical
+    /// dependencies between edge types. In the latter case, the spellings fed in are *inconsistent*.
+    /// Weights are parametrized by `Pitch.Class` and `Tendency` values.
+    public func generateWeights () -> [PitchedEdge: Double] {
+        let pitchedDependencies = findDependencies()
+        if pitchedDependencies.containsCycle() {
+            return generateWeightsFromCycles(pitchedDependencies)
+        }
+        func dependeciesReducer (
+            _ weights: inout [PitchedEdge: Double],
+            _ dependency: (key: PitchedEdge, value: [PitchedEdge])
+            )
+        {
+            func recursiveReducer (
+                _ weights: inout [PitchedEdge: Double],
+                _ dependency: (key: PitchedEdge, value: [PitchedEdge])
+                ) -> Double
+            {
+                let weight = dependency.value.reduce(1.0) { result, edge in
+                    if let edgeWeight = weights[edge] { return result + edgeWeight }
+                    return (
+                        result +
+                            recursiveReducer(&weights, (key: edge, value: pitchedDependencies.adjacencies[edge]!))
+                    )
+                }
+                weights[dependency.key] = weight
+                return weight
+            }
+            let _ = recursiveReducer(&weights, dependency)
+        }
+        return pitchedDependencies.adjacencies.reduce(into: [:], dependeciesReducer)
+    }
+
+    func generateWeightsFromCycles (_ dependencies: DiGraph<PitchedEdge>)
+        -> [PitchedEdge: Double] {
+            let directedAcyclicGraph = dependencies.DAGify()
+            let groupedWeights: [Set<PitchedEdge>: Double] = generateWeights(from: directedAcyclicGraph)
+            return groupedWeights.reduce(into: [PitchedEdge: Double]()) { runningWeights, pair in
+                pair.key.forEach { pitchedEdge in
+                    runningWeights[pitchedEdge] = pair.value
+                }
+            }
+    }
+
+    func generateWeights<Node> (from dependencies: DiGraph<Node>) -> [Node: Double] {
+        func dependeciesReducer (
+            _ weights: inout [Node: Double],
+            _ dependency: (key: Node, value: [Node])
+            )
+        {
+            func recursiveReducer (
+                _ weights: inout [Node: Double],
+                _ dependency: (key: Node, value: [Node])
+                ) -> Double
+            {
+                let weight = dependency.value.reduce(1.0) { result, edge in
+                    if weights[edge] != nil { return result + weights[edge]! }
+                    return result + recursiveReducer(
+                        &weights, (key: edge, value: dependencies.adjacencies[edge]!)
+                    )
+                }
+                weights[dependency.key] = weight
+                return weight
+            }
+            let _ = recursiveReducer(&weights, dependency)
+        }
+        return dependencies.adjacencies.reduce(into: [:], dependeciesReducer)
+    }
+
+    /// - Returns: For each `Edge`, a `Set` of `Edge` values, the sum of whose weights the edge's weight
+    /// must be greater than for the inverse spelling procedure to be valid.
+    func findDependencies () -> DiGraph<PitchedEdge> {
+        var residualNetwork = network
+        var weightDependencies: [PitchedEdge: [PitchedEdge]] = network.adjacencies
+            .reduce(into: [:]) { dependencies, adjacencyForNode in
+                adjacencyForNode.1.forEach { dependencies[
+                    PitchedEdge(
+                        nodeMapper(adjacencyForNode.0.unassigned),
+                        nodeMapper($0.unassigned))
+                    ] = [] }
+        }
+        while let augmentingPath = residualNetwork.augmentingPath() {
+            let preCutIndex = augmentingPath.lastIndex { $0.assignment == .down }!
+            let cutEdge = AssignedEdge(augmentingPath[preCutIndex], augmentingPath[preCutIndex+1])
+            for edge in augmentingPath.pairs.map(AssignedEdge.init) where edge != cutEdge {
+                weightDependencies[
+                    PitchedEdge(
+                        self.nodeMapper(edge.a.unassigned),
+                        self.nodeMapper(edge.b.unassigned)
+                    )
+                    ]!.append(
+                        PitchedEdge(
+                            self.nodeMapper(cutEdge.a.unassigned),
+                            self.nodeMapper(cutEdge.b.unassigned)
+                        )
+                )
+            }
+            residualNetwork.removeEdge(from: cutEdge.a, to: cutEdge.b)
+            residualNetwork.edge(from: cutEdge.b, to: cutEdge.a)
+        }
+        return DiGraph(weightDependencies)
+    }
+    
+    /// - Returns: getter from a `PitchSpeller.UnassignedNode` to a flow network pitched node
+    var nodeMapper: (UnassignedNode) -> PitchedNode {
+        return bind { Cross(self.pitchClass($0.index.a)!, $0.index.b) }
+    }
+}
 //
 //extension SpellingInverter {
 //
