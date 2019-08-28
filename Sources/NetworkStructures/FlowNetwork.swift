@@ -143,3 +143,14 @@ extension FlowNetwork: FlowNetworkProtocol {
         return Array(weights[node]!.keys)
     }
 }
+
+extension Sequence {
+    
+    func filterComplement (_ predicate: (Element) -> Bool) -> [Element] {
+        return filter { !predicate($0) }
+    }
+    
+    func partition (_ predicate: (Element) -> Bool) -> (whereFalse: [Element], whereTrue: [Element]) {
+        return (filterComplement(predicate), filter(predicate))
+    }
+}
