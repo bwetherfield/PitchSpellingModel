@@ -9,9 +9,14 @@ public struct UnweightedNetwork<InnerNode: Hashable> {
     public typealias Node = FlowNode<InnerNode>
     
     public var adjacencies: [Node: Set<Node>] = [.source: [], .sink: []]
-    private var reverseAdjacencies: [Node: [Node]] = [.source: [], .sink: []]
+    private var reverseAdjacencies: [Node: Set<Node>] = [.source: [], .sink: []]
     
     public init() {}
+    
+    public init(adjacencies: [Node: Set<Node>], reverseAdjacencies: [Node: Set<Node>]) {
+        self.adjacencies = adjacencies
+        self.reverseAdjacencies = reverseAdjacencies
+    }
 }
 
 extension UnweightedNetwork {
@@ -47,13 +52,12 @@ extension UnweightedNetwork {
         insert(start)
         insert(end)
         adjacencies[start]!.insert(end)
-        reverseAdjacencies[end]!.append(start)
+        reverseAdjacencies[end]!.insert(start)
     }
 }
 
 extension UnweightedNetwork {
-    public mutating func mask (_ scheme: NetworkScheme<InnerNode>)
-    {
+    public mutating func mask (_ scheme: NetworkScheme<InnerNode>) {
         adjacencies.forEach { (node, neighbors) in
             for neighbor in neighbors where !scheme.containsEdge(from: node, to: neighbor) {
             removeEdge(from: node, to: neighbor)
@@ -70,6 +74,4 @@ extension UnweightedNetwork: FlowNetworkProtocol {
     public func neighbors(of node: FlowNode<InnerNode>) -> [FlowNode<InnerNode>] {
         return Array(adjacencies[node]!)
     }
-    
-    
 }

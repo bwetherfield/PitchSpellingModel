@@ -124,6 +124,16 @@ extension FlowNetwork {
     }
 }
 
+extension FlowNetwork {
+    var unweighted: UnweightedNetwork<InnerNode> {
+        return UnweightedNetwork(
+            adjacencies: weights.reduce(into: [Node: Set<Node>]()) { adjacencies, forNode in
+            let (node, neighbors) = forNode
+            adjacencies[node] = Set(neighbors.keys)
+        }, reverseAdjacencies: reverseAdjacencies)
+    }
+}
+
 extension FlowNetwork: FlowNetworkProtocol {
     public var nodes: Set<FlowNode<InnerNode>> {
         return Set(weights.keys)
