@@ -8,7 +8,7 @@
 public struct UnweightedNetwork<InnerNode: Hashable> {
     typealias Node = FlowNode<InnerNode>
     
-    private var adjacencies: [Node: [Node]] = [.source: [], .sink: []]
+    private var adjacencies: [Node: Set<Node>] = [.source: [], .sink: []]
     private var reverseAdjacencies: [Node: [Node]] = [.source: [], .sink: []]
 }
 
@@ -39,7 +39,7 @@ extension UnweightedNetwork {
     private mutating func _insertEdge(from start: Node, to end: Node) {
         insert(start)
         insert(end)
-        adjacencies[start]!.append(end)
+        adjacencies[start]!.insert(end)
         reverseAdjacencies[end]!.append(start)
     }
 }
