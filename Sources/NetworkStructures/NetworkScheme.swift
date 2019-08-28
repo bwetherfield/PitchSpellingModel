@@ -25,9 +25,7 @@ extension NetworkScheme {
 extension NetworkScheme {
     func pullback<BackInnerNode>(_ innerLens: @escaping (BackInnerNode) -> InnerNode)
         -> NetworkScheme<BackInnerNode> {
-            return NetworkScheme<BackInnerNode>({
-                self.contains(Edge(bind(innerLens)($0.a), bind(innerLens)($0.b)))
-            })
+            return self.pullback(bind(innerLens))
     }
 }
 

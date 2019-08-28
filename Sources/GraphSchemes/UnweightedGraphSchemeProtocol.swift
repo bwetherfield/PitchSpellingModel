@@ -17,7 +17,7 @@ public protocol UnweightedGraphSchemeProtocol: GraphSchemeProtocol {
 
 extension UnweightedGraphSchemeProtocol {
     @inlinable
-    func pullback <H> (_ f: @escaping (H.Node) -> Node) -> H where H: UnweightedGraphSchemeProtocol {
+    public func pullback <H> (_ f: @escaping (H.Node) -> Node) -> H where H: UnweightedGraphSchemeProtocol {
         return H { self.contains(Edge(f($0.a),f($0.b))) }
     }
 }

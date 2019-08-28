@@ -19,7 +19,7 @@ public protocol WeightedGraphSchemeProtocol: GraphSchemeProtocol {
 
 extension WeightedGraphSchemeProtocol {
     @inlinable
-    func pullback <H> (_ f: @escaping (H.Node) -> Node) -> H where
+    public func pullback <H> (_ f: @escaping (H.Node) -> Node) -> H where
         H: WeightedGraphSchemeProtocol,
         H.Weight == Weight
     {
