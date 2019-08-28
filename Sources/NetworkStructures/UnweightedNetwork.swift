@@ -78,3 +78,14 @@ extension UnweightedNetwork {
         return nil
     }
 }
+
+extension UnweightedNetwork {
+    mutating func mask (_ scheme: NetworkScheme<InnerNode>)
+    {
+        adjacencies.forEach { (node, neighbors) in
+            for neighbor in neighbors where !scheme.containsEdge(from: node, to: neighbor) {
+            removeEdge(from: node, to: neighbor)
+            }
+        }
+    }
+}
