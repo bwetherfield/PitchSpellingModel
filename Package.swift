@@ -11,6 +11,9 @@ let package = Package(
             name: "PitchSpellingModel",
             targets: ["PitchSpellingModel"]),
         .library(
+            name: "GraphSchemes",
+            targets: ["GraphSchemes"]),
+        .library(
             name: "NetworkStructures",
             targets: ["NetworkStructures"]),
         .library(
@@ -32,8 +35,11 @@ let package = Package(
             name: "PitchSpellingModel",
             dependencies: []),
         .target(
+            name: "GraphSchemes",
+            dependencies: []),
+        .target(
             name: "NetworkStructures",
-            dependencies: ["DataStructures"]),
+            dependencies: ["DataStructures", "GraphSchemes"]),
         .target(
             name: "Encodings",
             dependencies: ["Pitch", "SpelledPitch", "DataStructures"]),
