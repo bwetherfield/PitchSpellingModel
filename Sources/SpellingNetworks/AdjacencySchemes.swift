@@ -10,11 +10,13 @@ import Encodings
 import DataStructures
 import Pitch
 
+typealias Connect = AdjacencySchemes
+
 struct AdjacencySchemes {
     
     /// Adjacency scheme that connects `.up` tendencies to `.down` tendencies
     // for sameInts
-    static let connectUpToDown: NetworkScheme<UnassignedInnerNode> =
+    static let upToDown: NetworkScheme<UnassignedInnerNode> =
         NetworkScheme<Tendency> { edge in
             switch (edge.a, edge.b) {
             case let (.internal(a), .internal(b)):
@@ -26,7 +28,7 @@ struct AdjacencySchemes {
     
     
     /// Adjacency scheme that connects `.source` to `.down` tendencies and not pitch class `8`
-    static let connectSourceToDown: NetworkScheme<Cross<Pitch.Class, Tendency>> =
+    static let sourceToDown: NetworkScheme<Cross<Pitch.Class, Tendency>> =
         NetworkScheme<Pitch.Class> { edge in
             edge.a == .source && edge.b != .internal(8)
             }.pullback { cross in cross.a }
@@ -35,7 +37,7 @@ struct AdjacencySchemes {
                 }.pullback { cross in cross.b }
     
     /// Adjacency scheme that connects `.up` tendencies and not pitch class `8` to `.sink`
-    static let connectUpToSink: NetworkScheme<Cross<Pitch.Class, Tendency>> =
+    static let upToSink: NetworkScheme<Cross<Pitch.Class, Tendency>> =
         NetworkScheme<Pitch.Class> { edge in
             edge.a != .internal(8) && edge.b == .sink
             }.pullback { cross in cross.a }
@@ -44,7 +46,7 @@ struct AdjacencySchemes {
                 }.pullback { cross in cross.b }
     
     /// Adjacency scheme that connects nodes with the same `int` value
-    static let connectSameInts: NetworkScheme<UnassignedInnerNode> =
+    static let sameInts: NetworkScheme<UnassignedInnerNode> =
         NetworkScheme<Int> { edge in
             switch (edge.a, edge.b) {
             case let (.internal(a), .internal(b)):
@@ -55,7 +57,7 @@ struct AdjacencySchemes {
             }.pullback { node in node.index.a }
     
     /// Adjacency scheme that connects nodes with different `int` values
-    static let connectDifferentInts: NetworkScheme<UnassignedInnerNode> =
+    static let differentInts: NetworkScheme<UnassignedInnerNode> =
         NetworkScheme<Int> { edge in
             switch (edge.a, edge.b) {
             case let (.internal(a), .internal(b)):
@@ -65,11 +67,11 @@ struct AdjacencySchemes {
             }
             }.pullback { node in node.index.a }
     
-    static var connectDifferentTendenciesAppropriately: NetworkScheme<Cross<Pitch.Class, Tendency>> {
+    static var differentTendenciesAppropriately: NetworkScheme<Cross<Pitch.Class, Tendency>> {
         return connectDifferentTendencies * connectPitchClassesForDifferentTendencies
     }
     
-    static var connectSameTendenciesAppropriately: NetworkScheme<Cross<Pitch.Class, Tendency>> {
+    static var sameTendenciesAppropriately: NetworkScheme<Cross<Pitch.Class, Tendency>> {
         return connectSameTendencies * connectPitchClassesForSameTendencies
     }
     

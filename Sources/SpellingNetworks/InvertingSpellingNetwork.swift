@@ -57,17 +57,19 @@ extension InvertingSpellingNetwork {
         self.network = UnweightedNetwork(internalNodes: internalNodes(spellings: spellings))
         self.pitchClass = { int in spellings[int]?.pitchClass }
 
-        let specificEdgeScheme: NetworkScheme<UnassignedInnerNode> = (upDownEdgeScheme.pullback(nodeMapper) + sameEdgeScheme.pullback(nodeMapper))
-            * connectDifferentInts
+        let specificEdgeScheme: NetworkScheme<UnassignedInnerNode> =
+            (Connect.sameTendenciesAppropriately +
+                Connect.differentTendenciesAppropriately).pullback(nodeMapper)
+            * Connect.differentInts
 
         let sameIntEdgesScheme: NetworkScheme<UnassignedInnerNode> =
-            sameIntsScheme * connectSameInts
+            Connect.upToDown * Connect.sameInts
 
         let specificSourceScheme: NetworkScheme<UnassignedInnerNode> =
-            sourceEdgeLookupScheme.pullback(nodeMapper)
+            Connect.sourceToDown.pullback(nodeMapper)
 
         let specificSinkScheme: NetworkScheme<UnassignedInnerNode> =
-            sinkEdgeLookupScheme.pullback(nodeMapper)
+            Connect.upToSink.pullback(nodeMapper)
 
         let allSchemes: [NetworkScheme<UnassignedInnerNode>] = [
             specificEdgeScheme,
