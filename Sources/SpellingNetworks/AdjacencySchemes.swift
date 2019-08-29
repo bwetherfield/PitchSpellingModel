@@ -65,8 +65,15 @@ struct AdjacencySchemes {
             }
             }.pullback { node in node.index.a }
     
-    /// Adjacency scheme that connects `.up` tendencies to `.down` tendencies and vice versa provided
-    /// the pitch classes of the nodes are connected per `upDownEdgeLookup`
+    static var connectDifferentTendenciesAppropriately: NetworkScheme<Cross<Pitch.Class, Tendency>> {
+        return connectDifferentTendencies * connectPitchClassesForDifferentTendencies
+    }
+    
+    static var connectSameTendenciesAppropriately: NetworkScheme<Cross<Pitch.Class, Tendency>> {
+        return connectSameTendencies * connectPitchClassesForSameTendencies
+    }
+    
+    /// Adjacency scheme that connects `.up` tendencies to `.down` tendencies and vice versa
     static let connectDifferentTendencies: NetworkScheme<Cross<Pitch.Class, Tendency>> =
         NetworkScheme { edge in
             switch (edge.a, edge.b) {
@@ -80,8 +87,7 @@ struct AdjacencySchemes {
             }
     }
     
-    /// Adjacency scheme that connects nodes with the same tendency provided the pitch classes of the nodes
-    /// are *not* connected per `upDownEdgeLookup`
+    /// Adjacency scheme that connects nodes with the same tendency
     static let connectSameTendencies: NetworkScheme<Cross<Pitch.Class, Tendency>> =
         NetworkScheme { edge in
             switch (edge.a, edge.b) {
