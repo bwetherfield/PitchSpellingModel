@@ -19,7 +19,7 @@ struct PitchSpellingNetwork {
     var flowNetwork: FlowNetwork<Cross<Int,Tendency>>
     
     /// The unspelled `Pitch.Class` values to be spelled.
-    let pitchClass: (Int) -> Pitch.Class?
+    let pitch: (Int) -> Pitch?
 }
 //
 //extension PitchSpellingNetwork {
@@ -54,56 +54,60 @@ struct PitchSpellingNetwork {
 //        flowNetwork.mask(maskArgument)
 //    }
 //}
-//
-//extension PitchSpeller {
-//
-//    // MARK: - Instance Methods
-//
-//    /// - Returns: An array of `SpelledPitch` values with the same indices as the original
-//    /// unspelled `Pitch` values.
-//    func spell() -> [Int: SpelledPitch] {
-//
-//        var assignedNodes: [AssignedNode] {
-//            var (sourceSide, sinkSide) = flowNetwork.minimumCut
-//            sourceSide.remove(.source)
-//            sinkSide.remove(.sink)
-//            let downNodes = sourceSide.map { index in AssignedNode(index, .down) }
-//            let upNodes = sinkSide.map { index in AssignedNode(index, .up) }
-//            return downNodes + upNodes
-//        }
-//        return assignedNodes
-//            .compactMap { (assignedNode) -> InternalAssignedNode? in
-//                switch assignedNode.index {
-//                case .source, .sink:
-//                    return nil
-//                case .internal(let index):
-//                    return InternalAssignedNode(index, assignedNode.assignment)
-//                }
-//            }
-//            .reduce(into: [Int: (InternalAssignedNode, InternalAssignedNode)]()) { pairs, node in
-//                if !pairs.keys.contains(node.index.a) {
-//                    pairs[node.index.a] = (node, node)
-//                } else {
-//                    switch node.index.b {
-//                    case .up: pairs[node.index.a]!.0 = node
-//                    case .down: pairs[node.index.a]!.1 = node
-//                    }
-//                }
-//            }.mapValues(spellPitch)
-//    }
-//
-//    private func spellPitch(
-//        _ up: InternalAssignedNode,
-//        _ down: InternalAssignedNode
-//        ) -> SpelledPitch
-//    {
-//        let pitch = self.pitch(.internal(up.index))!
-//        let tendencies = TendencyPair(up.assignment, down.assignment)
-//        let spelling = Pitch.Spelling(pitchClass: pitch.class, tendencies: tendencies)!
-//        return try! pitch.spelled(with: spelling)
-//    }
-//}
-//
+
+extension PitchSpellingNetwork {
+
+    // MARK: - Instance Methods
+
+    /// - Returns: An array of `SpelledPitch` values with the same indices as the original
+    /// unspelled `Pitch` values.
+    func spell() -> [Int: SpelledPitch] {
+
+        var assignedNodes: [AssignedNode] {
+            var (sourceSide, sinkSide) = flowNetwork.sourceWeightedMinimumCut
+            sourceSide.remove(.source)
+            sinkSide.remove(.sink)
+            let downNodes: [AssignedNode] = sourceSide.map(bind { index in
+                .init(index: index, assignment: .down)
+            })
+            let upNodes: [AssignedNode] = sinkSide.map(bind { index in
+                .init(index: index, assignment: .up)
+            })
+            return downNodes + upNodes
+        }
+        return assignedNodes
+            .compactMap { (assignedNode) -> AssignedInnerNode? in
+                switch assignedNode {
+                case .source, .sink:
+                    return nil
+                case .internal(let assignedInnerNode):
+                    return assignedInnerNode
+                }
+            }
+            .reduce(into: [Int: (AssignedInnerNode, AssignedInnerNode)]()) { pairs, node in
+                if !pairs.keys.contains(node.index.a) {
+                    pairs[node.index.a] = (node, node)
+                } else {
+                    switch node.index.b {
+                    case .up: pairs[node.index.a]!.0 = node
+                    case .down: pairs[node.index.a]!.1 = node
+                    }
+                }
+            }.mapValues(spellPitch)
+    }
+
+    private func spellPitch(
+        _ up: AssignedInnerNode,
+        _ down: AssignedInnerNode
+        ) -> SpelledPitch
+    {
+        let pitch = self.pitch(up.index.a)!
+        let tendencies = TendencyPair(up.assignment, down.assignment)
+        let spelling = Pitch.Spelling(pitchClass: pitch.class, tendencies: tendencies)!
+        return try! pitch.spelled(with: spelling)
+    }
+}
+
 //private let connectUpToDown: DirectedGraphScheme<PitchSpellingNode.Index> =
 //    DirectedGraphScheme<Tendency> { edge in edge.a == .up && edge.b == .down }
 //        .pullback { node in node.tendency }
