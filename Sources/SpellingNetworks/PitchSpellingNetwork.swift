@@ -19,7 +19,29 @@ struct PitchSpellingNetwork {
     var flowNetwork: FlowNetwork<Cross<Int,Tendency>>
     
     /// The unspelled `Pitch.Class` values to be spelled.
-    let pitch: (Int) -> Pitch?
+    let pitch: (Int) -> Pitch
+}
+
+extension PitchSpellingNetwork {
+    
+    init(pitches: [Int: Pitch], weightScheme: FlowNetworkScheme<Cross<Pitch.Class, Tendency>>) {
+        let pitch = { pitches[$0]! }
+        let nodes: [Cross<Int, Tendency>] = pitches.keys.reduce(into: []) { list, int in
+            list.append(.init(int, .down))
+            list.append(.init(int, .up))
+        }
+        let scheme: FlowNetworkScheme<Cross<Int, Tendency>> = weightScheme.pullback { cross in
+            let pitchClass = pitch(cross.a).class
+            return Cross(pitchClass, cross.b)
+            }
+        let bigM: FlowNetworkScheme<Cross<Int, Tendency>> = Double.infinity * (Connect.sameInts + Connect.upToDown)
+        let combinedScheme: FlowNetworkScheme<Cross<Int, Tendency>> = bigM + scheme
+        self.flowNetwork = FlowNetwork(
+            nodes: nodes,
+            scheme: combinedScheme
+            )
+        self.pitch = pitch
+    }
 }
 //
 //extension PitchSpellingNetwork {
@@ -101,7 +123,7 @@ extension PitchSpellingNetwork {
         _ down: AssignedInnerNode
         ) -> SpelledPitch
     {
-        let pitch = self.pitch(up.index.a)!
+        let pitch = self.pitch(up.index.a)
         let tendencies = TendencyPair(up.assignment, down.assignment)
         let spelling = Pitch.Spelling(pitchClass: pitch.class, tendencies: tendencies)!
         return try! pitch.spelled(with: spelling)
