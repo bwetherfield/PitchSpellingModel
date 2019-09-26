@@ -22,4 +22,10 @@ extension UnweightedNetworkSchemeProtocol {
     public static func * (lhs: Self, rhs: Self) -> Self {
         return Self { edge in lhs.contains(edge) && rhs.contains(edge) }
     }
+    
+    public static func *<H, W> (lhs: W, rhs: Self) -> H where H: WeightedGraphSchemeProtocol,
+        H.Edge == Edge, W == H.Weight {
+        return H.init({ rhs.contains($0) ? lhs : nil })
+    }
 }
+
