@@ -43,5 +43,14 @@ let package = Package(
         .testTarget(
             name: "PitchSpellingModelTests",
             dependencies: ["PitchSpellingModel"]),
+        .testTarget(
+            name: "NetworkStructuresTests",
+            dependencies: ["NetworkStructures"]),
+        .testTarget(
+            name: "EncodingsTests",
+            dependencies: ["Encodings"]),
+        .testTarget(
+            name: "SpellingNetworksTests",
+            dependencies: ["SpellingNetworks"]),
     ]
 )
