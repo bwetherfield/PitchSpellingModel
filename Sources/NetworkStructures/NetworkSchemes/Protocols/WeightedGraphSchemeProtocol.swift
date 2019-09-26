@@ -26,3 +26,28 @@ extension WeightedGraphSchemeProtocol {
         return H { self.weight(from: f($0.a), to: f($0.b)) }
     }
 }
+
+extension WeightedGraphSchemeProtocol {
+
+    public static func + (lhs: Self, rhs: Self) -> Self {
+        return Self { edge in
+            guard let left = lhs.weight(edge) else {
+                return rhs.weight(edge)
+            }
+            guard let right = rhs.weight(edge) else {
+                return left
+            }
+            return left + right
+        }
+    }
+
+    public static func * (lhs: Self, rhs: Self) -> Self {
+        return Self { edge in
+            if let left = lhs.weight(edge), let right = rhs.weight(edge) {
+                return left * right
+            } else {
+                return nil
+            }
+        }
+    }
+}

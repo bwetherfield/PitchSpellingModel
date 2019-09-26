@@ -12,28 +12,3 @@ extension FlowNetworkSchemeProtocol {
         return pullback(bind(f))
     }
 }
-
-extension FlowNetworkSchemeProtocol {
-
-    public static func + (lhs: Self, rhs: Self) -> Self {
-        return Self { edge in
-            guard let left = lhs.weight(edge) else {
-                return rhs.weight(edge)
-            }
-            guard let right = rhs.weight(edge) else {
-                return left
-            }
-            return left + right
-        }
-    }
-
-    public static func * (lhs: Self, rhs: Self) -> Self {
-        return Self { edge in
-            if let left = lhs.weight(edge), let right = rhs.weight(edge) {
-                return left * right
-            } else {
-                return nil
-            }
-        }
-    }
-}
