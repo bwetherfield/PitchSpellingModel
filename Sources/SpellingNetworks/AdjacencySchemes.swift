@@ -29,7 +29,7 @@ struct AdjacencySchemes {
             default:
                 return false
             }
-            }.pullback { node in node.index.b }
+            }.pullback { node in node.b }
     
     
     /// Adjacency scheme that connects `.source` to `.down` tendencies and not pitch class `8`
@@ -59,7 +59,7 @@ struct AdjacencySchemes {
             default:
                 return false
             }
-            }.pullback { node in node.index.a }
+            }.pullback { node in node.a }
     
     /// Adjacency scheme that connects nodes with different `int` values
     static let differentInts: NetworkScheme<UnassignedInnerNode> =
@@ -70,7 +70,7 @@ struct AdjacencySchemes {
             default:
                 return false
             }
-            }.pullback { node in node.index.a }
+            }.pullback { node in node.a }
     
     static var differentTendenciesAppropriately: NetworkScheme<Cross<Pitch.Class, Tendency>> {
         return connectDifferentTendencies * connectPitchClassesForDifferentTendencies

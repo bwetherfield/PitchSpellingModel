@@ -187,7 +187,7 @@ extension InvertingSpellingNetwork {
     
     /// - Returns: getter from an `UnassignedNode` value to a flow network pitched node
     var nodeMapper: (UnassignedNode) -> PitchedNode {
-        return bind { Cross(self.pitchClass($0.index.a)!, $0.index.b) }
+        return bind { Cross(self.pitchClass($0.a)!, $0.b) }
     }
 }
 
@@ -222,7 +222,7 @@ private let sameIntsScheme: NetworkScheme<UnassignedInnerNode> =
         default:
             return false
         }
-    }.pullback { node in node.index.b }
+    }.pullback { node in node.b }
 
 
 /// Adjacency scheme that connects `.source` to `.down` tendencies and not pitch class `8`
@@ -252,7 +252,7 @@ private let connectSameInts: NetworkScheme<UnassignedInnerNode> =
         default:
             return false
         }
-    }.pullback { node in node.index.a }
+    }.pullback { node in node.a }
 
 /// Adjacency scheme that connects nodes with different `int` values
 private let connectDifferentInts: NetworkScheme<UnassignedInnerNode> =
@@ -263,7 +263,7 @@ private let connectDifferentInts: NetworkScheme<UnassignedInnerNode> =
         default:
             return false
         }
-    }.pullback { node in node.index.a }
+    }.pullback { node in node.a }
 
 /// Adjacency scheme that connects `.up` tendencies to `.down` tendencies and vice versa provided
 /// the pitch classes of the nodes are connected per `upDownEdgeLookup`
