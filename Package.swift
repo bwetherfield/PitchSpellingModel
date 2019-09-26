@@ -8,9 +8,6 @@ let package = Package(
     products: [
         // Products define the executables and libraries produced by a package, and make them visible to other packages.
         .library(
-            name: "PitchSpellingModel",
-            targets: ["PitchSpellingModel"]),
-        .library(
             name: "NetworkStructures",
             targets: ["NetworkStructures"]),
         .library(
@@ -29,9 +26,6 @@ let package = Package(
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
-            name: "PitchSpellingModel",
-            dependencies: []),
-        .target(
             name: "NetworkStructures",
             dependencies: ["DataStructures"]),
         .target(
@@ -40,9 +34,6 @@ let package = Package(
         .target(
             name: "SpellingNetworks",
             dependencies: ["NetworkStructures", "Encodings"]),
-        .testTarget(
-            name: "PitchSpellingModelTests",
-            dependencies: ["PitchSpellingModel"]),
         .testTarget(
             name: "NetworkStructuresTests",
             dependencies: ["NetworkStructures"]),
