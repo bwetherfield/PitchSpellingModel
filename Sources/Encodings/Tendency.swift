@@ -18,12 +18,6 @@ public enum Tendency: Int {
     case up = 1
 }
 
-extension Tendency: Comparable {
-    public static func < (lhs: Tendency, rhs: Tendency) -> Bool {
-        return lhs.rawValue < rhs.rawValue
-    }
-}
-
 extension Tendency: Codable { }
 
 extension Pitch.Spelling {
