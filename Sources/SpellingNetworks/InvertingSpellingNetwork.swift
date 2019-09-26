@@ -18,14 +18,6 @@ struct InvertingSpellingNetwork {
 }
 
 extension InvertingSpellingNetwork {
-    
-    typealias AssignedEdge = OrderedPair<AssignedNode>
-    typealias UnassignedEdge = OrderedPair<UnassignedNode>
-    public typealias PitchedNode = FlowNode<Cross<Pitch.Class, Tendency>>
-    public typealias PitchedEdge = UnorderedPair<PitchedNode>
-}
-
-extension InvertingSpellingNetwork {
 
     // MARK: - Initializers
 

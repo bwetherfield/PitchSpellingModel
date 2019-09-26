@@ -10,6 +10,11 @@ import Encodings
 import DataStructures
 import Pitch
 
+typealias AssignedEdge = OrderedPair<AssignedNode>
+typealias UnassignedEdge = OrderedPair<UnassignedNode>
+public typealias PitchedNode = FlowNode<Cross<Pitch.Class, Tendency>>
+public typealias PitchedEdge = UnorderedPair<PitchedNode>
+
 typealias Connect = AdjacencySchemes
 
 struct AdjacencySchemes {
