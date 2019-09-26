@@ -16,6 +16,28 @@ public struct FlowNetwork<InnerNode: Hashable> {
 }
 
 extension FlowNetwork {
+    
+    public init (nodes: [InnerNode], scheme: FlowNetworkScheme<InnerNode>) {
+        self.init()
+        nodes.forEach { node in
+            if let weight = scheme.weight(from: .sink, to: .internal(node)) {
+                sourceEdge(to: node, withWeight: weight)
+            }
+            if let weight = scheme.weight(from: .internal(node), to: .sink) {
+                sinkEdge(from: node, withWeight: weight)
+            }
+            nodes.forEach { destination in
+                if node != destination {
+                    if let weight = scheme.weight(from: .internal(node), to: .internal(destination)) {
+                        edge(from: node, to: destination, withWeight: weight)
+                    }
+                }
+            }
+        }
+    }
+}
+
+extension FlowNetwork {
     mutating func insert(_ node: InnerNode) {
         insert(.internal(node))
     }
