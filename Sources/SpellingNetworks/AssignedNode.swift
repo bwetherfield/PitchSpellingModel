@@ -32,6 +32,6 @@ public struct AssignedInnerNode: Hashable {
 
 extension AssignedInnerNode {
     var unassigned: UnassignedInnerNode {
-        return .init(index: index)
+        return index
     }
 }
