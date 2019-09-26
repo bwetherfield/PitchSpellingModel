@@ -18,7 +18,7 @@ struct PitchSpellingNetwork {
     /// The `FlowNetwork` which will be manipulated in order to spell the unspelled `pitches`.
     var flowNetwork: FlowNetwork<Cross<Int,Tendency>>
     
-    /// The unspelled `Pitch.Class` values to be spelled.
+    /// The unspelled `Pitch` values to be spelled.
     let pitch: (Int) -> Pitch
 }
 
