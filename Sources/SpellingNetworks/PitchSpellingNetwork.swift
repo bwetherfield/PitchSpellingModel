@@ -34,7 +34,7 @@ extension PitchSpellingNetwork {
             let pitchClass = pitch(cross.a).class
             return Cross(pitchClass, cross.b)
             }
-        let withinScheme: FlowNetworkScheme<Cross<Int, Tendency>> = Double.infinity * (Connect.sameInts + Connect.upToDown)
+        let withinScheme: FlowNetworkScheme<Cross<Int, Tendency>> = Double.infinity * (Connect.sameInts * Connect.upToDown)
         let combinedScheme: FlowNetworkScheme<Cross<Int, Tendency>> = withinScheme + betweenScheme
         self.flowNetwork = FlowNetwork(
             nodes: nodes,
