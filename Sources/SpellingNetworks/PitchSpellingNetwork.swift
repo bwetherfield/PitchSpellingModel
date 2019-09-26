@@ -43,39 +43,6 @@ extension PitchSpellingNetwork {
         self.pitch = pitch
     }
 }
-//
-//extension PitchSpellingNetwork {
-//
-//    // MARK: - Initializers
-//
-//    /// Creates a `PitchSpeller` to spell the given `pitches`, with the given `parsimonyPivot`.
-//    init(pitches: [Int: Pitch]) {
-//        self.flowNetwork = FlowNetwork(internalNodes: internalNodes(pitches: pitches))
-//        self.pitchClass = { pitches[$0]!.class }
-//
-//        let internalPitchClassTendency = { (cross: Cross<Int, Tendency>) in
-//            Cross(pitches[cross.a]!.class, cross.b)
-//        }
-//        let pitchClassTendencyGetter = bind(internalPitchClassTendency)
-//
-//        let specificSourceEdges: WeightedDirectedGraphScheme<PitchSpellingNode.Index, Double> =
-//            sourceEdges.pullback(pitchClassTendencyGetter)
-//        let specificInternalEdges: WeightedDirectedGraphScheme<PitchSpellingNode.Index, Double> =
-//            internalEdges.pullback(pitchClassTendencyGetter)
-//        let specificSinkEdges: WeightedDirectedGraphScheme<PitchSpellingNode.Index, Double> =
-//            sinkEdges.pullback(pitchClassTendencyGetter)
-//
-//        // All the connections that rely on pitch class specific information
-//        let connections: WeightedDirectedGraphScheme<PitchSpellingNode.Index, Double> =
-//            (connectDifferentInts * specificInternalEdges) + specificSourceEdges + specificSinkEdges
-//
-//        // Combination of pitch class specific information and connections within each `Int` index
-//        // regardless of pitch class.
-//        let maskArgument: WeightedDirectedGraphScheme<PitchSpellingNode.Index, Double> =
-//            connections + bigMAssignment
-//        flowNetwork.mask(maskArgument)
-//    }
-//}
 
 extension PitchSpellingNetwork {
 
