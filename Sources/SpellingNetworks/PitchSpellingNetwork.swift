@@ -30,12 +30,12 @@ extension PitchSpellingNetwork {
             list.append(.init(int, .down))
             list.append(.init(int, .up))
         }
-        let scheme: FlowNetworkScheme<Cross<Int, Tendency>> = weightScheme.pullback { cross in
+        let betweenScheme: FlowNetworkScheme<Cross<Int, Tendency>> = weightScheme.pullback { cross in
             let pitchClass = pitch(cross.a).class
             return Cross(pitchClass, cross.b)
             }
-        let bigM: FlowNetworkScheme<Cross<Int, Tendency>> = Double.infinity * (Connect.sameInts + Connect.upToDown)
-        let combinedScheme: FlowNetworkScheme<Cross<Int, Tendency>> = bigM + scheme
+        let withinScheme: FlowNetworkScheme<Cross<Int, Tendency>> = Double.infinity * (Connect.sameInts + Connect.upToDown)
+        let combinedScheme: FlowNetworkScheme<Cross<Int, Tendency>> = withinScheme + betweenScheme
         self.flowNetwork = FlowNetwork(
             nodes: nodes,
             scheme: combinedScheme
