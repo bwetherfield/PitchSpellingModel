@@ -11,8 +11,8 @@ public struct FlowNetwork<InnerNode: Hashable> {
     
     public typealias Node = FlowNode<InnerNode>
 
-    private var weights: [Node: [Node: Double]] = [.source: [:], .sink: [:]]
-    private var reverseAdjacencies: [Node: Set<Node>] = [.source: [], .sink: []]
+    public var weights: [Node: [Node: Double]] = [.source: [:], .sink: [:]]
+    public var reverseAdjacencies: [Node: Set<Node>] = [.source: [], .sink: []]
 }
 
 extension FlowNetwork {
