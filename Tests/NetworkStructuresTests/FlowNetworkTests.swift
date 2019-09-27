@@ -48,7 +48,6 @@ class FlowNetworkTests: XCTestCase {
     
     func testResidualNetwork() {
         let residualNetwork = network.residualNetwork
-        print(residualNetwork.adjacencies)
         XCTAssertEqual(residualNetwork.neighbors(of: .source), [])
         XCTAssertEqual(Set(residualNetwork.neighbors(of: .internal("a"))), [.source, .internal("b")])
         XCTAssertEqual(residualNetwork.neighbors(of: .internal("b")), [.internal("a")])
