@@ -1,5 +1,6 @@
 # PitchSpellingModel
 
+![Swift Version](https://img.shields.io/badge/Swift-5.1-orange.svg)
 [![Build Status](https://travis-ci.com/bwetherfield/PitchSpellingModel.svg?branch=latest)](https://travis-ci.com/bwetherfield/PitchSpellingModel)
 [![Code Coverage](https://codecov.io/gh/bwetherfield/PitchSpellingModel/branch/latest/graph/badge.svg)](https://codecov.io/github/bwetherfield/PitchSpellingModel)
 
