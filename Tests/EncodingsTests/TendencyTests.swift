@@ -26,4 +26,9 @@ class TendencyTests: XCTestCase {
         let dDoubleFlat = Pitch.Spelling(pitchClass: 0, tendencies: .init(.down, .down))
         XCTAssertEqual(dDoubleFlat, .dDoubleFlat)
     }
+    
+    func testPitchSpellingFromTendenciesZeroNil() {
+        XCTAssertNil(Pitch.Spelling(pitchClass: 0, tendencies: .init(.down, .up)))
+    }
+    
 }
