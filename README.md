@@ -1,6 +1,6 @@
 # PitchSpellingModel
 
-[![Build Status](https://travis-ci.org/bwetherfield/PitchSpellingModel.svg?branch=latest)](https://travis-ci.org/bwetherfield/PitchSpellingModel)
+[![Build Status](https://travis-ci.com/bwetherfield/PitchSpellingModel.svg?branch=latest)](https://travis-ci.com/bwetherfield/PitchSpellingModel)
 
 ## Contents
 
