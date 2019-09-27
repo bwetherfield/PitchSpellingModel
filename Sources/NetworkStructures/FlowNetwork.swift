@@ -172,7 +172,11 @@ extension FlowNetwork: FlowNetworkProtocol {
     }
     
     public func reverseNeighbors(of node: Node) -> [Node] {
-        return Array(reverseAdjacencies[node]!)
+        if let slice = reverseAdjacencies[node] {
+            return Array(slice)
+        } else {
+            return []
+        }
     }
 }
 

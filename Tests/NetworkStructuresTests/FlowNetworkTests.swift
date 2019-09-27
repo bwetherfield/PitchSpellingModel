@@ -32,5 +32,6 @@ class FlowNetworkTests: XCTestCase {
         network.sinkEdge(from: "b", withWeight: 1)
         network.removeEdge(from: .internal("a"), to: .internal("b"))
         XCTAssertEqual(network.neighbors(of: .internal("a")), [])
+        XCTAssertEqual(network.reverseNeighbors(of: .internal("b")), [])
     }
 }
