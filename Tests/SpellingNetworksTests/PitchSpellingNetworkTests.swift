@@ -172,13 +172,12 @@ class PitchSpellingNetworkTests: XCTestCase {
         }
         invertingSpellingNetwork.connect(via: pairing)
         let weights: [PitchedEdge: Double] = invertingSpellingNetwork.generateWeights()
-        print(weights)
         weightScheme = FlowNetworkScheme<Cross<Pitch.Class, Tendency>> { return weights[.init($0.a, $0.b)] }
     }
     
     func testPitchSpellingNetwork() {
         let pitchSpellingNetwork = PitchSpellingNetwork(pitches: [0: 1, 1: 3], weightScheme: weightScheme!)
-        print(pitchSpellingNetwork.spell())
+        print(pitchSpellingNetwork.flowNetwork.weights)
     }
     
     override func tearDown() {
