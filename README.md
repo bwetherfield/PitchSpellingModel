@@ -6,7 +6,7 @@
 
 ### Encodings
 
-[`Encodings`](https://github.com/bwetherfield/PitchSpellingModel/tree/latest/Sources/Encodings) implements mappings between models of music and notation, drawn from the `dn-m` ecosystem (_cf._ [`Music`](https://github.com/dn-m/Music), [`NotationalModel`](https://github.com/dn-m/NotationalModel)), and my Pitch Spelling Model.
+[`Encodings`](https://github.com/bwetherfield/PitchSpellingModel/tree/latest/Sources/Encodings) implements mappings between models of music and notation, drawn from the **dn-m** ecosystem (_cf._ [`Music`](https://github.com/dn-m/Music), [`NotationalModel`](https://github.com/dn-m/NotationalModel)), and my Pitch Spelling Model.
 
 ### NetworkStructures
 
