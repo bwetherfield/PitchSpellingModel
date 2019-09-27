@@ -71,14 +71,6 @@ extension FlowNetwork {
     mutating func removeEdge(from start: Node, to end: Node) {
         weights[start]![end] = nil
         reverseAdjacencies[end]!.remove(start)
-        if start != .sink && start != .source {
-            if weights[start]!.isEmpty { weights[start] = nil }
-            if reverseAdjacencies[start]!.isEmpty { reverseAdjacencies[start] = nil }
-        }
-        if end != .sink && end != .source {
-            if weights[end]!.isEmpty { weights[end] = nil }
-            if reverseAdjacencies[end]!.isEmpty { reverseAdjacencies[end] = nil }
-        }
     }
 }
 
