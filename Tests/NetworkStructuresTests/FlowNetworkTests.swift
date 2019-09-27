@@ -34,6 +34,11 @@ class FlowNetworkTests: XCTestCase {
         XCTAssertEqual(network.reverseNeighbors(of: .internal("b")), [])
     }
     
+    func testPushFlow() {
+        network.pushFlow(from: .internal("a"), to: .internal("b"), by: 1)
+        XCTAssertEqual(network.weights[.internal("a")]![.internal("b")], 1)
+    }
+    
     override func tearDown() {
         network = nil
     }
