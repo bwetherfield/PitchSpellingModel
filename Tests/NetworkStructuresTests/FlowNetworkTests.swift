@@ -54,6 +54,13 @@ class FlowNetworkTests: XCTestCase {
         XCTAssertEqual(residualNetwork.neighbors(of: .sink), [.internal("b")])
     }
     
+    func testMinimumCut() {
+        XCTAssertEqual(network.sourceWeightedMinimumCut.0, [.internal("a"), .internal("b"), .source])
+        XCTAssertEqual(network.sourceWeightedMinimumCut.1, [.sink])
+        XCTAssertEqual(network.sinkWeightedMinimumCut.0, [.source])
+        XCTAssertEqual(network.sinkWeightedMinimumCut.1, [.internal("a"), .internal("b"), .sink])
+    }
+    
     override func tearDown() {
         network = nil
     }
