@@ -50,4 +50,11 @@ extension WeightedGraphSchemeProtocol {
             }
         }
     }
+    
+    public static func *<H> (lhs: Self, rhs: H) -> Self
+        where H: UnweightedGraphSchemeProtocol, H.Edge == Edge {
+        return Self { edge in
+            return rhs.contains(edge) ? lhs.weight(edge) : nil
+        }
+    }
 }
