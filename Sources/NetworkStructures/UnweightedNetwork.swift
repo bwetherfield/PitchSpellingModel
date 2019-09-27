@@ -90,7 +90,7 @@ extension UnweightedNetwork: FlowNetworkProtocol {
     }
     
     public func neighbors(of node: Node) -> [Node] {
-        return Array(adjacencies[node]!)
+        return Array<Node>(adjacencies[node]!)
     }
     
     public func reverseNeighbors(of node: Node) -> [Node] {

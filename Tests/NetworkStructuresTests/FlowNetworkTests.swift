@@ -43,6 +43,16 @@ class FlowNetworkTests: XCTestCase {
         network.pushFlow(through: [.source, .internal("a"), .internal("b"), .sink])
         XCTAssertEqual(network.weights[.internal("a")]![.internal("b")], 1)
         XCTAssertEqual(network.neighbors(of: .source), [])
+        XCTAssertEqual(network.neighbors(of: .sink), [.internal("b")])
+    }
+    
+    func testResidualNetwork() {
+        let residualNetwork = network.residualNetwork
+        print(residualNetwork.adjacencies)
+        XCTAssertEqual(residualNetwork.neighbors(of: .source), [])
+        XCTAssertEqual(Set(residualNetwork.neighbors(of: .internal("a"))), [.source, .internal("b")])
+        XCTAssertEqual(residualNetwork.neighbors(of: .internal("b")), [.internal("a")])
+        XCTAssertEqual(residualNetwork.neighbors(of: .sink), [.internal("b")])
     }
     
     override func tearDown() {
