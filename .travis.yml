@@ -4,6 +4,9 @@ language: generic
 sudo: required
 dist: trusty
 osx_image: xcode10.2
+env: CODECOV_TOKEN=d3a86965-3cfb-4f8d-9bc4-3258234d2802
 script:
   - swift package update
-  - swift test
+  - swift package generate-xcodeproj
+  - xcodebuild -quiet -project PitchSpellingModel.xcodeproj -scheme PitchSpellingModel-Package -enableCodeCoverage YES build test
+  - bash <(curl -s https://codecov.io/bash);
