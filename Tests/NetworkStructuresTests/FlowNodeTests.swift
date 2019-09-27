@@ -13,6 +13,14 @@ import Foundation
 
 class FlowNodeTests: XCTestCase {
     
+    func testBind() {
+        let identity: (Int) -> Int = { $0 }
+        let boundIdentity = NetworkStructures.bind(identity)
+        XCTAssertEqual(boundIdentity(.source), .source)
+        XCTAssertEqual(boundIdentity(.sink), .sink)
+        XCTAssertEqual(boundIdentity(.internal(1)), .internal(1))
+    }
+    
     func testEncodableFlowNode() {
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted
