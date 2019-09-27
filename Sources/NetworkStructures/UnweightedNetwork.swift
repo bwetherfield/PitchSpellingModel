@@ -20,6 +20,24 @@ public struct UnweightedNetwork<InnerNode: Hashable> {
 }
 
 extension UnweightedNetwork {
+    public func contains(_ node: Node) -> Bool {
+        return adjacencies.keys.contains(node)
+    }
+    
+    public func containsEdge(from source: InnerNode, to destination: InnerNode) -> Bool {
+        return adjacencies[.internal(source)]?.contains(.internal(destination)) ?? false
+    }
+    
+    public func containsSourceEdge(to destination: InnerNode) -> Bool {
+        return adjacencies[.source]?.contains(.internal(destination)) ?? false
+    }
+    
+    public func containsSinkEdge(from source: InnerNode) -> Bool {
+        return adjacencies[.internal(source)]?.contains(.sink) ?? false
+    }
+}
+
+extension UnweightedNetwork {
     
     public mutating func removeEdge(from start: Node, to end: Node) {
         adjacencies[start]!.remove(end)

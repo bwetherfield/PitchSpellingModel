@@ -250,3 +250,89 @@ private func node (_ offset: Int, _ index: Tendency, _ pitchSpelling: Pitch.Spel
     let tendencies = pitchCategory.tendenciesToDirection[value: direction]!
     return .init(index: .init(offset, index), assignment: index == .up ? tendencies.a : tendencies.b)
 }
+
+extension InvertingSpellingNetwork {
+    
+    // MARK: - Convenience Functions
+    
+    /// Convenience function for testing presence of a given node in the `flowNetwork`
+    func contains (_ indexing: (index: Int, offset: Tendency), _ assignment: Tendency) -> Bool {
+        return network.contains(
+            .internal(.init(
+                index: Cross(indexing.index, indexing.offset),
+                assignment: assignment)
+            )
+        )
+    }
+    
+    /// Convenience function for testing presence of an internal edge (ignoring assignments)
+    func containsEdge (
+        from source: (index: Int, offset: Tendency),
+        to destination: (index: Int, offset: Tendency)
+    ) -> Bool {
+        return [
+            (.up,.up),
+            (.up,.down),
+            (.down,.down),
+            (.down,.up)
+        ].reduce(false) { (accumulating: Bool, next: (Tendency, Tendency)) -> Bool in
+            accumulating ||
+            containsEdge(
+                from: (source.index, source.offset, next.0),
+                to: (destination.index, destination.offset, next.1)
+            )
+        }
+    }
+    
+    /// Convenience function for testing presence of internal edge (with assignments)
+    func containsEdge (
+        from source: (index: Int, offset: Tendency, assignment: Tendency),
+        to destination: (index: Int, offset: Tendency, assignment: Tendency)
+    ) -> Bool {
+        return network.containsEdge(
+            from: .init(index: Cross(source.index, source.offset), assignment: source.assignment),
+            to: .init(index: Cross(destination.index, destination.offset), assignment: destination.assignment)
+        )
+    }
+    
+    /// Convenience function for testing presence of edge from source (ignoring assignment)
+    func containsSourceEdge (to destination: (index: Int, offset: Tendency)) -> Bool {
+        return [.up, .down].reduce(false) { accumulating, next in
+            accumulating || containsSourceEdge(
+                to: (destination.index, destination.offset, next)
+            )
+        }
+    }
+    
+    /// Convenience function for testing presence of edge to sink (ignoring assignment)
+    func containsSinkEdge(from source: (index: Int, offset: Tendency)) -> Bool {
+        return [.up, .down].reduce(false) { accumulating, next in
+            accumulating || containsSinkEdge(
+                from: (source.index, source.offset, next)
+            )
+        }
+    }
+    
+    /// Convenience function for testing presence of edge from source (with assignments)
+    func containsSourceEdge (
+        to destination: (index: Int, offset: Tendency, assignment: Tendency)
+    ) -> Bool {
+        return network.containsSourceEdge(to: .init(
+                index: Cross(destination.index, destination.offset),
+                assignment: destination.assignment
+            )
+        )
+}
+    
+    /// Convenience function for testing presence of edge to sink (with assignments)
+    func containsSinkEdge (
+        from source: (index: Int, offset: Tendency, assignment: Tendency)
+    ) -> Bool {
+        return network.containsSinkEdge(
+            from: .init(
+                index: Cross(source.index, source.offset),
+                assignment: source.assignment
+            )
+        )
+    }
+}
