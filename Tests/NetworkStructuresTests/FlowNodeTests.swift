@@ -6,8 +6,6 @@
 //
 
 import XCTest
-import Pitch
-import SpelledPitch
 import Foundation
 @testable import NetworkStructures
 
