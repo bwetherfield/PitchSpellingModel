@@ -164,7 +164,11 @@ extension FlowNetwork: FlowNetworkProtocol {
     }
     
     public func neighbors(of node: Node) -> [Node] {
-        return Array(weights[node]!.keys)
+        if let slice = weights[node] {
+            return Array(slice.keys)
+        } else {
+            return []
+        }
     }
     
     public func reverseNeighbors(of node: Node) -> [Node] {

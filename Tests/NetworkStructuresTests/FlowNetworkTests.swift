@@ -22,4 +22,15 @@ class FlowNetworkTests: XCTestCase {
         XCTAssertEqual(network.neighbors(of: .source), [.internal("a")])
         XCTAssertEqual(network.neighbors(of: .sink), [])
     }
+    
+    func testRemoveEdges() {
+        var network = FlowNetwork<String>()
+        network.insert("a")
+        network.insert("b")
+        network.edge(from: "a", to: "b", withWeight: 2)
+        network.sourceEdge(to: "a", withWeight: 1)
+        network.sinkEdge(from: "b", withWeight: 1)
+        network.removeEdge(from: .internal("a"), to: .internal("b"))
+        XCTAssertEqual(network.neighbors(of: .internal("a")), [])
+    }
 }
