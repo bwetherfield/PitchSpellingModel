@@ -30,10 +30,16 @@ extension PitchSpellingNetwork {
             list.append(.init(int, .down))
             list.append(.init(int, .up))
         }
-        let differentIntScheme: FlowNetworkScheme<Cross<Int, Tendency>> = weightScheme.pullback { cross in
+        let pitchClassMap: (Cross<Int, Tendency>) -> Cross<Pitch.Class, Tendency> = { cross in
             let pitchClass = pitch(cross.a).class
             return Cross(pitchClass, cross.b)
-            }
+        }
+        let differentIntScheme: FlowNetworkScheme<Cross<Int, Tendency>> =
+            weightScheme.pullback(pitchClassMap)
+                * (
+                    Connect.differentInts
+                        + (Connect.sourceToDown + Connect.upToSink).pullback(pitchClassMap)
+        )
         let sameIntScheme: FlowNetworkScheme<Cross<Int, Tendency>> = Double.infinity * (Connect.sameInts * Connect.upToDown)
         let combinedScheme: FlowNetworkScheme<Cross<Int, Tendency>> = sameIntScheme + differentIntScheme
         self.flowNetwork = FlowNetwork(
@@ -50,10 +56,14 @@ extension PitchSpellingNetwork {
 
     /// - Returns: An array of `SpelledPitch` values with the same indices as the original
     /// unspelled `Pitch` values.
-    func spell() -> [Int: SpelledPitch] {
+    func spell(tending: Tendency = .up) -> [Int: SpelledPitch] {
 
         var assignedNodes: [AssignedNode] {
-            var (sourceSide, sinkSide) = flowNetwork.sourceWeightedMinimumCut
+            var (sourceSide, sinkSide): (
+            Set<FlowNode<Cross<Int, Tendency>>>,
+            Set<FlowNode<Cross<Int, Tendency>>>
+            )
+            (sourceSide, sinkSide) = (tending == .up) ? flowNetwork.sinkWeightedMinimumCut : flowNetwork.sourceWeightedMinimumCut
             sourceSide.remove(.source)
             sinkSide.remove(.sink)
             let downNodes: [AssignedNode] = sourceSide.map(bind { index in

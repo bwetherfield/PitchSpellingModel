@@ -11,8 +11,8 @@ public struct FlowNetwork<InnerNode: Hashable> {
     
     public typealias Node = FlowNode<InnerNode>
 
-    private var weights: [Node: [Node: Double]] = [.source: [:], .sink: [:]]
-    private var reverseAdjacencies: [Node: Set<Node>] = [.source: [], .sink: []]
+    public var weights: [Node: [Node: Double]] = [.source: [:], .sink: [:]]
+    public var reverseAdjacencies: [Node: Set<Node>] = [.source: [], .sink: []]
 }
 
 extension FlowNetwork {
@@ -20,7 +20,7 @@ extension FlowNetwork {
     public init (nodes: [InnerNode], scheme: FlowNetworkScheme<InnerNode>) {
         self.init()
         nodes.forEach { node in
-            if let weight = scheme.weight(from: .sink, to: .internal(node)) {
+            if let weight = scheme.weight(from: .source, to: .internal(node)) {
                 sourceEdge(to: node, withWeight: weight)
             }
             if let weight = scheme.weight(from: .internal(node), to: .sink) {
@@ -71,14 +71,6 @@ extension FlowNetwork {
     mutating func removeEdge(from start: Node, to end: Node) {
         weights[start]![end] = nil
         reverseAdjacencies[end]!.remove(start)
-        if start != .sink && start != .source {
-            if weights[start]!.isEmpty { weights[start] = nil }
-            if reverseAdjacencies[start]!.isEmpty { reverseAdjacencies[start] = nil }
-        }
-        if end != .sink && end != .source {
-            if weights[end]!.isEmpty { weights[end] = nil }
-            if reverseAdjacencies[end]!.isEmpty { reverseAdjacencies[end] = nil }
-        }
     }
 }
 
@@ -164,11 +156,19 @@ extension FlowNetwork: FlowNetworkProtocol {
     }
     
     public func neighbors(of node: Node) -> [Node] {
-        return Array(weights[node]!.keys)
+        if let slice = weights[node] {
+            return Array(slice.keys)
+        } else {
+            return []
+        }
     }
     
     public func reverseNeighbors(of node: Node) -> [Node] {
-        return Array(reverseAdjacencies[node]!)
+        if let slice = reverseAdjacencies[node] {
+            return Array(slice)
+        } else {
+            return []
+        }
     }
 }
 
