@@ -175,9 +175,9 @@ class PitchSpellingNetworkTests: XCTestCase {
         weightScheme = FlowNetworkScheme<Cross<Pitch.Class, Tendency>> { return weights[.init($0.a, $0.b)] }
     }
     
-    func testPitchSpellingNetwork() {
-        let pitchSpellingNetwork = PitchSpellingNetwork(pitches: [0: 1], weightScheme: weightScheme!)
-        print(pitchSpellingNetwork.flowNetwork.weights[.source])
+    func testTrivialPitchSpellingNetwork() {
+        let pitchSpellingNetwork = PitchSpellingNetwork(pitches: [0: 0], weightScheme: weightScheme!)
+        XCTAssertEqual(pitchSpellingNetwork.spell()[0]!.spelling, .c)
     }
     
     override func tearDown() {
