@@ -176,8 +176,8 @@ class PitchSpellingNetworkTests: XCTestCase {
     }
     
     func testPitchSpellingNetwork() {
-        let pitchSpellingNetwork = PitchSpellingNetwork(pitches: [0: 1, 1: 3], weightScheme: weightScheme!)
-        print(pitchSpellingNetwork.flowNetwork.weights)
+        let pitchSpellingNetwork = PitchSpellingNetwork(pitches: [0: 1], weightScheme: weightScheme!)
+        print(pitchSpellingNetwork.flowNetwork.weights[.source])
     }
     
     override func tearDown() {

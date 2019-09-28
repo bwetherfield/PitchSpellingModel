@@ -20,7 +20,7 @@ extension FlowNetwork {
     public init (nodes: [InnerNode], scheme: FlowNetworkScheme<InnerNode>) {
         self.init()
         nodes.forEach { node in
-            if let weight = scheme.weight(from: .sink, to: .internal(node)) {
+            if let weight = scheme.weight(from: .source, to: .internal(node)) {
                 sourceEdge(to: node, withWeight: weight)
             }
             if let weight = scheme.weight(from: .internal(node), to: .sink) {

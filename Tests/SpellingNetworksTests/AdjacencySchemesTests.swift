@@ -10,6 +10,10 @@ import XCTest
 
 class AdjacencySchemesTests:XCTestCase {
     
+    func testSourceToDown() {
+        XCTAssert(Connect.sourceToDown.containsEdge(from: .source, to: .internal(.init(9, .down))))
+    }
+    
     func testExternalToExternalNodes() {
         XCTAssertFalse(Connect.connectPitchClassesForSameTendencies.containsEdge(from: .source, to: .sink))
         XCTAssertFalse(Connect.connectSameTendencies.containsEdge(from: .source, to: .sink))
