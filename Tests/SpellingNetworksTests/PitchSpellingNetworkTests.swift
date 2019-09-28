@@ -177,25 +177,29 @@ class PitchSpellingNetworkTests: XCTestCase {
     
     func testTrivialPitchSpellingNetwork() {
         let pitchSpellingNetwork = PitchSpellingNetwork(pitches: [0: 0], weightScheme: weightScheme!)
-        XCTAssertEqual(pitchSpellingNetwork.spell()[0]!.spelling, .c)
+        let spelledPitches = pitchSpellingNetwork.spell()
+        XCTAssertEqual(spelledPitches[0]!.spelling, .c)
     }
     
     func testDyadSpellingEFlatG() {
         let pitchSpellingNetwork = PitchSpellingNetwork(pitches: [0: 3, 1: 7], weightScheme: weightScheme!)
-        XCTAssertEqual(pitchSpellingNetwork.spell()[0]!.spelling, .eFlat)
-        XCTAssertEqual(pitchSpellingNetwork.spell()[1]!.spelling, .g)
+        let spelledPitches = pitchSpellingNetwork.spell()
+        XCTAssertEqual(spelledPitches[0]!.spelling, .eFlat)
+        XCTAssertEqual(spelledPitches[1]!.spelling, .g)
     }
     
     func testDyadSpellingCSharpDSharp() {
         let pitchSpellingNetwork = PitchSpellingNetwork(pitches: [0: 1, 1: 3], weightScheme: weightScheme!)
-        XCTAssertEqual(pitchSpellingNetwork.spell(preferring: .sharps)[0]!.spelling, .cSharp)
-        XCTAssertEqual(pitchSpellingNetwork.spell(preferring: .sharps)[1]!.spelling, .dSharp)
+        let spelledPitches = pitchSpellingNetwork.spell(preferring: .sharps)
+        XCTAssertEqual(spelledPitches[0]!.spelling, .cSharp)
+        XCTAssertEqual(spelledPitches[1]!.spelling, .dSharp)
     }
     
     func testDyadSpellingDFlatEFlat() {
         let pitchSpellingNetwork = PitchSpellingNetwork(pitches: [0: 1, 1: 3], weightScheme: weightScheme!)
-        XCTAssertEqual(pitchSpellingNetwork.spell(preferring: .flats)[0]!.spelling, .dFlat)
-        XCTAssertEqual(pitchSpellingNetwork.spell(preferring: .flats)[1]!.spelling, .eFlat)
+        let spelledPitches = pitchSpellingNetwork.spell(preferring: .flats)
+        XCTAssertEqual(spelledPitches[0]!.spelling, .dFlat)
+        XCTAssertEqual(spelledPitches[1]!.spelling, .eFlat)
     }
     
     func testTriadSpellingEFlatBFlatD() {
