@@ -198,6 +198,14 @@ class PitchSpellingNetworkTests: XCTestCase {
         XCTAssertEqual(pitchSpellingNetwork.spell(preferring: .flats)[1]!.spelling, .eFlat)
     }
     
+    func testTriadSpellingEFlatBFlatD() {
+        let pitchSpellingNetwork = PitchSpellingNetwork(pitches: [0: 3, 1: 10, 2: 2], weightScheme: weightScheme!)
+        let spelledPitches = pitchSpellingNetwork.spell()
+        XCTAssertEqual(spelledPitches[0]!.spelling, .eFlat)
+        XCTAssertEqual(spelledPitches[1]!.spelling, .bFlat)
+        XCTAssertEqual(spelledPitches[2]!.spelling, .d)
+    }
+    
     override func tearDown() {
         weightScheme = nil
         super.tearDown()
