@@ -194,8 +194,8 @@ class PitchSpellingNetworkTests: XCTestCase {
     
     func testDyadSpellingDFlatEFlat() {
         let pitchSpellingNetwork = PitchSpellingNetwork(pitches: [0: 1, 1: 3], weightScheme: weightScheme!)
-        XCTAssertEqual(pitchSpellingNetwork.spell(preferring: .sharps)[0]!.spelling, .dFlat)
-        XCTAssertEqual(pitchSpellingNetwork.spell(preferring: .sharps)[1]!.spelling, .eFlat)
+        XCTAssertEqual(pitchSpellingNetwork.spell(preferring: .flats)[0]!.spelling, .dFlat)
+        XCTAssertEqual(pitchSpellingNetwork.spell(preferring: .flats)[1]!.spelling, .eFlat)
     }
     
     override func tearDown() {
