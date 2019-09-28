@@ -188,14 +188,14 @@ class PitchSpellingNetworkTests: XCTestCase {
     
     func testDyadSpellingCSharpDSharp() {
         let pitchSpellingNetwork = PitchSpellingNetwork(pitches: [0: 1, 1: 3], weightScheme: weightScheme!)
-        XCTAssertEqual(pitchSpellingNetwork.spell(tending: .up)[0]!.spelling, .cSharp)
-        XCTAssertEqual(pitchSpellingNetwork.spell(tending: .up)[1]!.spelling, .dSharp)
+        XCTAssertEqual(pitchSpellingNetwork.spell(preferring: .sharps)[0]!.spelling, .cSharp)
+        XCTAssertEqual(pitchSpellingNetwork.spell(preferring: .sharps)[1]!.spelling, .dSharp)
     }
     
     func testDyadSpellingDFlatEFlat() {
         let pitchSpellingNetwork = PitchSpellingNetwork(pitches: [0: 1, 1: 3], weightScheme: weightScheme!)
-        XCTAssertEqual(pitchSpellingNetwork.spell(tending: .down)[0]!.spelling, .dFlat)
-        XCTAssertEqual(pitchSpellingNetwork.spell(tending: .down)[1]!.spelling, .eFlat)
+        XCTAssertEqual(pitchSpellingNetwork.spell(preferring: .sharps)[0]!.spelling, .dFlat)
+        XCTAssertEqual(pitchSpellingNetwork.spell(preferring: .sharps)[1]!.spelling, .eFlat)
     }
     
     override func tearDown() {

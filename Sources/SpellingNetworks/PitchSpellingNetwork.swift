@@ -51,19 +51,24 @@ extension PitchSpellingNetwork {
 }
 
 extension PitchSpellingNetwork {
+    
+    enum Preference {
+        case sharps
+        case flats
+    }
 
     // MARK: - Instance Methods
 
     /// - Returns: An array of `SpelledPitch` values with the same indices as the original
     /// unspelled `Pitch` values.
-    func spell(tending: Tendency = .up) -> [Int: SpelledPitch] {
+    func spell(preferring preference: Preference = .sharps) -> [Int: SpelledPitch] {
 
         var assignedNodes: [AssignedNode] {
             var (sourceSide, sinkSide): (
             Set<FlowNode<Cross<Int, Tendency>>>,
             Set<FlowNode<Cross<Int, Tendency>>>
             )
-            (sourceSide, sinkSide) = (tending == .up) ? flowNetwork.sinkWeightedMinimumCut : flowNetwork.sourceWeightedMinimumCut
+            (sourceSide, sinkSide) = (preference == .sharps) ? flowNetwork.sinkWeightedMinimumCut : flowNetwork.sourceWeightedMinimumCut
             sourceSide.remove(.source)
             sinkSide.remove(.sink)
             let downNodes: [AssignedNode] = sourceSide.map(bind { index in
