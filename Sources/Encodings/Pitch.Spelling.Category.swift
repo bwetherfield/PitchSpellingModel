@@ -128,8 +128,9 @@ extension Pitch.Spelling {
     static func letterName(pitchClass: Pitch.Class, with modifierDirection: ModifierDirection)
         -> LetterName
     {
-        guard let neutralLetterName = Pitch.Spelling.neutralLetterName(for: pitchClass)
-            else { return modifierDirection == .down ? .a : .g }
+        guard let neutralLetterName = Self.neutralLetterName(for: pitchClass) else {
+            return modifierDirection == .down ? .a : .g
+        }
         switch modifierDirection {
         case .down: return neutralLetterName.successor
         case .neutral: return neutralLetterName
