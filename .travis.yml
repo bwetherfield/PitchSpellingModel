@@ -1,12 +1,20 @@
 os:
   - osx
+  - linux
 language: generic
 sudo: required
 dist: trusty
-osx_image: xcode10.2
-env: CODECOV_TOKEN=d3a86965-3cfb-4f8d-9bc4-3258234d2802
+osx_image: xcode11
+install:
+  - eval "$(curl -sL https://swiftenv.fuller.li/install.sh)"
+env:
+  - SWIFT_VERSION=5.1
 script:
   - swift package update
-  - swift package generate-xcodeproj
-  - xcodebuild -quiet -project PitchSpellingModel.xcodeproj -scheme PitchSpellingModel-Package -enableCodeCoverage YES build test
-  - bash <(curl -s https://codecov.io/bash);
+  - if [ $TRAVIS_OS_NAME = 'osx' ]; then
+      swift package generate-xcodeproj;
+      xcodebuild -quiet -project PitchSpellingModel.xcodeproj -scheme PitchSpellingModel-Package -enableCodeCoverage YES build test;
+      bash <(curl -s https://codecov.io/bash);
+    else
+      swift test;
+    fi
