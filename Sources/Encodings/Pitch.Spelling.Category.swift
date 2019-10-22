@@ -99,10 +99,7 @@ extension Pitch.Spelling {
     /// `PitchSpellingCategoryProtocol` in which the given `pitchClass` resides. Otherwise, `nil`.
     init?(pitchClass: Pitch.Class, modifierDirection: ModifierDirection) {
         let letterName = Pitch.Spelling.letterName(pitchClass: pitchClass, with: modifierDirection)
-        guard
-            let category = Category[pitchClass],
-            let modifier = category.directionToModifier[modifierDirection]
-        else {
+        guard let modifier = Category[pitchClass]?.directionToModifier[modifierDirection] else {
             return nil
         }
         self.init(letterName, modifier)
@@ -114,8 +111,7 @@ extension Pitch.Spelling {
     /// - Returns: The `LetterName` which corresponds to the `.neutral` `ModifierDirection` for the
     /// the given `pitchClass`, if such a `LetterName` exists. Otherwise, `nil`.
     static func neutralLetterName(for pitchClass: Pitch.Class) -> LetterName? {
-        guard let category = Category[pitchClass] else { return nil }
-        guard let modifier = category.directionToModifier[.neutral] else { return nil }
+        guard let modifier = Category[pitchClass]?.directionToModifier[.neutral] else { return nil }
         switch modifier {
         case .natural:
             return LetterName.default(for: pitchClass)
