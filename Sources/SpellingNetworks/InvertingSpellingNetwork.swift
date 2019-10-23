@@ -245,7 +245,7 @@ private func internalNodes (spellings: [Int: Pitch.Spelling]) -> [AssignedInnerN
 private func node (_ offset: Int, _ index: Tendency, _ pitchSpelling: Pitch.Spelling)
     -> AssignedInnerNode
 {
-    let pitchCategory = Pitch.Spelling.Category.category(for: pitchSpelling.pitchClass)!
+    let pitchCategory = Pitch.Spelling.Category[pitchSpelling.pitchClass]!
     let direction = pitchCategory.directionToModifier[value: pitchSpelling.modifier]!
     let tendencies = pitchCategory.tendenciesToDirection[value: direction]!
     return .init(index: .init(offset, index), assignment: index == .up ? tendencies.a : tendencies.b)

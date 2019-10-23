@@ -27,7 +27,7 @@ extension Pitch.Spelling {
     /// possible. Otherwise, returns `nil`.
     public init?(pitchClass: Pitch.Class, tendencies: TendencyPair) {
         guard
-            let category = Pitch.Spelling.Category.category(for: pitchClass),
+            let category = Pitch.Spelling.Category[pitchClass],
             let modifierDirection = category.modifierDirection(for: tendencies)
         else {
             return nil
