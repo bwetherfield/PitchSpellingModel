@@ -210,6 +210,12 @@ class PitchSpellingNetworkTests: XCTestCase {
         XCTAssertEqual(spelledPitches[2]!.spelling, .d)
     }
     
+    func testTriadCDFlatENatural() {
+        let pitchSpellingNetwork = PitchSpellingNetwork(pitches: [0: 0, 1: 1, 2: 4], weightScheme: weightScheme!)
+        let spelledPitches = pitchSpellingNetwork.spell()
+        dump(spelledPitches)
+    }
+    
     override func tearDown() {
         weightScheme = nil
         super.tearDown()
