@@ -46,6 +46,7 @@ extension InvertingSpellingNetworkTests {
         ("testMajorThirds", testMajorThirds),
         ("testMinorThirds", testMinorThirds),
         ("testPerfectFourths", testPerfectFourths),
+        ("testPitchSpellingNetworkFactoryMethod", testPitchSpellingNetworkFactoryMethod),
         ("testSemitones", testSemitones),
         ("testTones", testTones),
         ("testWeightsDerivationWithSimpleCycle", testWeightsDerivationWithSimpleCycle),
@@ -61,6 +62,7 @@ extension PitchSpellingNetworkTests {
         ("testDyadSpellingCSharpDSharp", testDyadSpellingCSharpDSharp),
         ("testDyadSpellingDFlatEFlat", testDyadSpellingDFlatEFlat),
         ("testDyadSpellingEFlatG", testDyadSpellingEFlatG),
+        ("testSimplePairwiseMasking", testSimplePairwiseMasking),
         ("testTriadSpellingEFlatBFlatD", testTriadSpellingEFlatBFlatD),
         ("testTrivialPitchSpellingNetwork", testTrivialPitchSpellingNetwork),
     ]
