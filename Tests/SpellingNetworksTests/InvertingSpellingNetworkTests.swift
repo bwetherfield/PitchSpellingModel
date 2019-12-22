@@ -281,7 +281,7 @@ class InvertingSpellingNetworkTests: XCTestCase {
     }
     
     func testCycleCheckFSharpASharpGFlatBFlat() {
-        var invertingSpellingNetwork = InvertingSpellingNetwork(spellings: [
+        let invertingSpellingNetwork = InvertingSpellingNetwork(spellings: [
             1: Pitch.Spelling(.f,.sharp),
             2: Pitch.Spelling(.a,.sharp),
             3: Pitch.Spelling(.g,.flat),
@@ -297,7 +297,7 @@ class InvertingSpellingNetworkTests: XCTestCase {
     }
     
     func testCycleCheckFSharpASharpGFlatBFlatSubGraphs() {
-        var invertingSpellingNetwork = InvertingSpellingNetwork(spellings: [
+        let invertingSpellingNetwork = InvertingSpellingNetwork(spellings: [
             1: Pitch.Spelling(.f,.sharp),
             2: Pitch.Spelling(.a,.sharp),
             3: Pitch.Spelling(.g,.flat),
@@ -308,7 +308,7 @@ class InvertingSpellingNetworkTests: XCTestCase {
     }
     
     func testConsistentBasicExample() {
-        var invertingSpellingNetwork = InvertingSpellingNetwork(spellings: [
+        let invertingSpellingNetwork = InvertingSpellingNetwork(spellings: [
             1: Pitch.Spelling(.f, .sharp),
             2: Pitch.Spelling(.a, .sharp),
             3: Pitch.Spelling(.f, .sharp),
@@ -352,7 +352,7 @@ class InvertingSpellingNetworkTests: XCTestCase {
             .b,
             .c
         ]
-        var invertingSpellingNetwork = InvertingSpellingNetwork(spellings: semitones)
+        let invertingSpellingNetwork = InvertingSpellingNetwork(spellings: semitones)
         let pairing = NetworkScheme<Int> { edge in
             switch (edge.a, edge.b) {
             case let (.internal(a), .internal(b)):
@@ -392,7 +392,7 @@ class InvertingSpellingNetworkTests: XCTestCase {
             .b,
             Pitch.Spelling(.c, .sharp)
         ]
-        var invertingSpellingNetwork = InvertingSpellingNetwork(spellings: tones)
+        let invertingSpellingNetwork = InvertingSpellingNetwork(spellings: tones)
         let pairing = NetworkScheme<Int> { edge in
             switch (edge.a, edge.b) {
             case let (.internal(a), .internal(b)):
@@ -432,7 +432,7 @@ class InvertingSpellingNetworkTests: XCTestCase {
             .b,
             .d
         ]
-        var invertingSpellingNetwork = InvertingSpellingNetwork(spellings: minorThirds)
+        let invertingSpellingNetwork = InvertingSpellingNetwork(spellings: minorThirds)
         let pairing = NetworkScheme<Int> { edge in
             switch (edge.a, edge.b) {
             case let (.internal(a), .internal(b)):
@@ -472,7 +472,7 @@ class InvertingSpellingNetworkTests: XCTestCase {
             .b,
             Pitch.Spelling(.d, .sharp)
         ]
-        var invertingSpellingNetwork = InvertingSpellingNetwork(spellings: majorThirds)
+        let invertingSpellingNetwork = InvertingSpellingNetwork(spellings: majorThirds)
         let pairing = NetworkScheme<Int> { edge in
             switch (edge.a, edge.b) {
             case let (.internal(a), .internal(b)):
@@ -512,7 +512,7 @@ class InvertingSpellingNetworkTests: XCTestCase {
             .b,
             .e
         ]
-        var invertingSpellingNetwork = InvertingSpellingNetwork(spellings: perfectFourths)
+        let invertingSpellingNetwork = InvertingSpellingNetwork(spellings: perfectFourths)
         let pairing = NetworkScheme<Int> { edge in
             switch (edge.a, edge.b) {
             case let (.internal(a), .internal(b)):
@@ -657,7 +657,7 @@ class InvertingSpellingNetworkTests: XCTestCase {
             .e
         ]
         let dyads = semitones + tones + minorThirds + majorThirds + perfectFourths
-        var invertingSpellingNetwork = InvertingSpellingNetwork(spellings: dyads)
+        let invertingSpellingNetwork = InvertingSpellingNetwork(spellings: dyads)
         let pairing = NetworkScheme<Int> { edge in
             switch (edge.a, edge.b) {
             case let (.internal(a), .internal(b)):
@@ -671,7 +671,7 @@ class InvertingSpellingNetworkTests: XCTestCase {
     }
     
     func testCycleCheckFSharpASharpGFlatBFlatSubGraphsAfterStronglyConnectedComponentsClumped() {
-        var invertingSpellingNetwork = InvertingSpellingNetwork(spellings: [
+        let invertingSpellingNetwork = InvertingSpellingNetwork(spellings: [
             1: Pitch.Spelling(.f,.sharp),
             2: Pitch.Spelling(.a,.sharp),
             3: Pitch.Spelling(.g,.flat),
@@ -682,7 +682,7 @@ class InvertingSpellingNetworkTests: XCTestCase {
     }
     
     func testWeightsDerivationWithSimpleCycle() {
-        var invertingSpellingNetwork = InvertingSpellingNetwork(spellings: [
+        let invertingSpellingNetwork = InvertingSpellingNetwork(spellings: [
             1: Pitch.Spelling(.f,.sharp),
             2: Pitch.Spelling(.a,.sharp),
             3: Pitch.Spelling(.g,.flat),
@@ -737,7 +737,7 @@ class InvertingSpellingNetworkTests: XCTestCase {
     }
     
     func testGroupBuilderTwoGroups() {
-        var invertingSpellingNetwork1 = InvertingSpellingNetwork(spellings: [.c, .d])
+        let invertingSpellingNetwork1 = InvertingSpellingNetwork(spellings: [.c, .d])
         let mask = NetworkScheme<Int> { edge in
             switch (edge.a, edge.b) {
             case (.internal, .internal):
@@ -752,7 +752,7 @@ class InvertingSpellingNetworkTests: XCTestCase {
     }
     
     func testGroupBuilderTwoGroupsMoreComplicated() {
-        var invertingSpellingNetwork1 = InvertingSpellingNetwork(spellings: [.c, .d, .e])
+        let invertingSpellingNetwork1 = InvertingSpellingNetwork(spellings: [.c, .d, .e])
         let mask = NetworkScheme<Int> { edge in
             (edge.contains(.internal(1)) && edge.contains(.internal(2))) || edge.contains(.source) || edge.contains(.sink)
         }
@@ -762,7 +762,7 @@ class InvertingSpellingNetworkTests: XCTestCase {
     }
     
     func testGroupBuilderThreeGroupsMoreComplicated() {
-        var invertingSpellingNetwork1 = InvertingSpellingNetwork(spellings: [.c, .d, .e, .f])
+        let invertingSpellingNetwork1 = InvertingSpellingNetwork(spellings: [.c, .d, .e, .f])
         let mask = NetworkScheme<Int> { edge in
             (edge.contains(.internal(1)) && edge.contains(.internal(2))) || edge.contains(.source) || edge.contains(.sink)
         }
@@ -772,7 +772,7 @@ class InvertingSpellingNetworkTests: XCTestCase {
     }
     
     func testGroupBuilderThreeGroupsMoreComplicatedPartitionSyntax() {
-        var invertingSpellingNetwork1 = InvertingSpellingNetwork(spellings: [.c, .d, .e, .f])
+        let invertingSpellingNetwork1 = InvertingSpellingNetwork(spellings: [.c, .d, .e, .f])
         invertingSpellingNetwork1.partition(via: [
             0: 0,
             1: 1,

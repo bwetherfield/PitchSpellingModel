@@ -161,7 +161,7 @@ class PitchSpellingNetworkTests: XCTestCase {
             .e
         ]
         let dyads = semitones + tones + minorThirds + majorThirds + perfectFourths
-        var invertingSpellingNetwork = InvertingSpellingNetwork(spellings: dyads)
+        let invertingSpellingNetwork = InvertingSpellingNetwork(spellings: dyads)
         let pairing = NetworkScheme<Int> { edge in
             switch (edge.a, edge.b) {
             case let (.internal(a), .internal(b)):
