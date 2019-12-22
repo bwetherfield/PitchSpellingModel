@@ -24,7 +24,7 @@ class PitchSpellingNetwork {
     /// The masking scheme to be applied before spelling
     private var maskScheme: FlowNetworkScheme<Cross<Int,Tendency>>? = nil
     
-    /// The underlying masking scheme implementation of `maskScheme`
+    /// The underlying implementation of `maskScheme`
     private var _maskScheme: FlowNetworkScheme<Cross<Int,Tendency>> {
         get {
             return maskScheme ?? FlowNetworkScheme<Cross<Int, Tendency>> { _ in 1 }
