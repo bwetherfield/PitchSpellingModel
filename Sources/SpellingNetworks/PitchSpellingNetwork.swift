@@ -79,6 +79,7 @@ extension PitchSpellingNetwork {
     func spell(preferring preference: Preference = .sharps) -> [Int: SpelledPitch] {
         if let scheme = maskScheme {
             flowNetwork.mask(scheme)
+            maskScheme = nil
         }
         var assignedNodes: [AssignedNode] {
             var (sourceSide, sinkSide): (
