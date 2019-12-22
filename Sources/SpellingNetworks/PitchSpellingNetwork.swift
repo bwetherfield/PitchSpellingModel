@@ -87,8 +87,6 @@ extension PitchSpellingNetwork {
             Set<FlowNode<Cross<Int, Tendency>>>
             )
             (sourceSide, sinkSide) = (preference == .sharps) ? flowNetwork.sinkWeightedMinimumCut : flowNetwork.sourceWeightedMinimumCut
-            sourceSide.remove(.source)
-            sinkSide.remove(.sink)
             let downNodes: [AssignedNode] = sourceSide.map(bind { index in
                 .init(index: index, assignment: .down)
             })
