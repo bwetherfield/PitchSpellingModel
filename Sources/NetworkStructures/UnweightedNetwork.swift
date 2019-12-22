@@ -72,9 +72,7 @@ extension UnweightedNetwork {
         adjacencies[start]!.insert(end)
         reverseAdjacencies[end]!.insert(start)
     }
-}
 
-extension UnweightedNetwork {
     public mutating func mask (_ scheme: NetworkScheme<InnerNode>) {
         adjacencies.forEach { (node, neighbors) in
             for neighbor in neighbors where !scheme.containsEdge(from: node, to: neighbor) {

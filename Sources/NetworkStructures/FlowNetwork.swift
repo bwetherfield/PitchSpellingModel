@@ -38,6 +38,9 @@ extension FlowNetwork {
 }
 
 extension FlowNetwork {
+    
+    // MARK: - Mutating Methods
+    
     mutating func insert(_ node: InnerNode) {
         insert(.internal(node))
     }
@@ -95,11 +98,6 @@ extension FlowNetwork {
             }
         }
     }
-}
-
-extension FlowNetwork {
-    
-    // MARK: - Mutating Methods
     
     mutating func reduceFlow(from start: Node, to end: Node, by amount: Double) {
         weights[start]![end]! -= amount
