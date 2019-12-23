@@ -11,17 +11,14 @@ import DataStructures
 import Pitch
 import SpelledPitch
 
-struct InvertingSpellingNetwork {
+class InvertingSpellingNetwork {
     
     var network: UnweightedNetwork<AssignedInnerNode>
     let pitchClass: (Int) -> Pitch.Class?
-}
-
-extension InvertingSpellingNetwork {
 
     // MARK: - Initializers
 
-    public init(spellings: [[Pitch.Spelling]]) {
+    convenience init(spellings: [[Pitch.Spelling]]) {
         let flattenedSpellings: [Pitch.Spelling] = spellings.reduce(into: []) { flattened, list in
             list.forEach { flattened.append($0) }
         }
@@ -37,7 +34,7 @@ extension InvertingSpellingNetwork {
         self.partition(via: indexing)
     }
 
-    init(spellings: [Pitch.Spelling]) {
+    convenience init(spellings: [Pitch.Spelling]) {
         let indexed: [Int: Pitch.Spelling] = spellings.enumerated().reduce(into: [:]) { indexedSpellings, indexedSpelling in
             let (index, spelling) = indexedSpelling
             indexedSpellings[index] = spelling
@@ -80,6 +77,17 @@ extension InvertingSpellingNetwork {
 }
 
 extension InvertingSpellingNetwork {
+    
+    /// - Returns: A closure that generates a PitchSpellingNetwork from an indexed collection of `Pitch` values
+    public func pitchSpellingNetworkFactory () -> ([Int: Pitch]) -> PitchSpellingNetwork {
+        let weights = generateWeights()
+        return { pitches in
+            let weightScheme = FlowNetworkScheme { edge in
+                weights[.init(edge.a, edge.b)]
+            }
+            return PitchSpellingNetwork(pitches: pitches, weightScheme: weightScheme)
+        }
+    }
 
     /// - Returns: A concrete distribution of weights to satisfy the weight relationships delimited by
     /// `weightDependencies` or `nil` if no such distribution is possible, i.e. there are cyclical
@@ -193,7 +201,7 @@ extension InvertingSpellingNetwork {
 
 extension InvertingSpellingNetwork {
     
-    mutating func partition (via indices: [Int: Int]) {
+    func partition (via indices: [Int: Int]) {
         let adjacencyScheme = NetworkScheme<Int> { edge in
             switch (edge.a, edge.b) {
             case let (.internal(a), .internal(b)):
@@ -205,7 +213,7 @@ extension InvertingSpellingNetwork {
         connect(via: adjacencyScheme)
     }
     
-    mutating func connect(via scheme: NetworkScheme<Int>) {
+    func connect(via scheme: NetworkScheme<Int>) {
         let temp: NetworkScheme<Cross<Int, Tendency>>
             = (scheme + NetworkScheme<Int> { edge in edge.a == edge.b }).pullback { cross in cross.a }
         let mask: NetworkScheme<AssignedInnerNode> = temp.pullback { node in node.index }

@@ -11,18 +11,28 @@ import Encodings
 import Pitch
 import SpelledPitch
 
-struct PitchSpellingNetwork {
+class PitchSpellingNetwork {
     
     // MARK: - Instance Properties
     
     /// The `FlowNetwork` which will be manipulated in order to spell the unspelled `pitches`.
     var flowNetwork: FlowNetwork<Cross<Int,Tendency>>
-    
+        
     /// The unspelled `Pitch` values to be spelled.
     let pitch: (Int) -> Pitch
-}
-
-extension PitchSpellingNetwork {
+    
+    /// The masking scheme to be applied before spelling
+    private var maskScheme: FlowNetworkScheme<Cross<Int,Tendency>>? = nil
+    
+    /// The underlying implementation of `maskScheme`
+    private var _maskScheme: FlowNetworkScheme<Cross<Int,Tendency>> {
+        get {
+            return maskScheme ?? FlowNetworkScheme<Cross<Int, Tendency>> { _ in 1 }
+        }
+        set {
+            maskScheme = newValue
+        }
+    }
     
     init(pitches: [Int: Pitch], weightScheme: FlowNetworkScheme<Cross<Pitch.Class, Tendency>>) {
         let pitch = { pitches[$0]! }
@@ -58,19 +68,25 @@ extension PitchSpellingNetwork {
     }
 
     // MARK: - Instance Methods
+    
+    // Adjusts edge weights based on an external scaling rule
+    func mask <T> (scheme: FlowNetworkScheme<T>, _ lens: @escaping (Int) -> T) {
+        _maskScheme *= scheme.pullback(lens).pullback { $0.a }
+    }
 
     /// - Returns: An array of `SpelledPitch` values with the same indices as the original
     /// unspelled `Pitch` values.
     func spell(preferring preference: Preference = .sharps) -> [Int: SpelledPitch] {
-
+        if let scheme = maskScheme {
+            flowNetwork.mask(scheme)
+            maskScheme = nil
+        }
         var assignedNodes: [AssignedNode] {
             var (sourceSide, sinkSide): (
             Set<FlowNode<Cross<Int, Tendency>>>,
             Set<FlowNode<Cross<Int, Tendency>>>
             )
             (sourceSide, sinkSide) = (preference == .sharps) ? flowNetwork.sinkWeightedMinimumCut : flowNetwork.sourceWeightedMinimumCut
-            sourceSide.remove(.source)
-            sinkSide.remove(.sink)
             let downNodes: [AssignedNode] = sourceSide.map(bind { index in
                 .init(index: index, assignment: .down)
             })

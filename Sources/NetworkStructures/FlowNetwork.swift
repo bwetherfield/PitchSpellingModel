@@ -38,6 +38,9 @@ extension FlowNetwork {
 }
 
 extension FlowNetwork {
+    
+    // MARK: - Mutating Methods
+    
     mutating func insert(_ node: InnerNode) {
         insert(.internal(node))
     }
@@ -72,11 +75,8 @@ extension FlowNetwork {
         weights[start]![end] = nil
         reverseAdjacencies[end]!.remove(start)
     }
-}
-
-extension FlowNetwork {
     
-    mutating func mask (_ scheme: NetworkScheme<InnerNode>) {
+    public mutating func mask (_ scheme: NetworkScheme<InnerNode>) {
         weights.forEach { (node, neighbors) in
             neighbors.keys.forEach { neighbor in
                 if !scheme.containsEdge(from: node, to: neighbor) { weights[node]![neighbor] = nil }
@@ -84,7 +84,7 @@ extension FlowNetwork {
         }
     }
     
-    mutating func mask (_ weightScheme: FlowNetworkScheme<InnerNode>) {
+    public mutating func mask (_ weightScheme: FlowNetworkScheme<InnerNode>) {
         weights.forEach { (node, neighbors) in
             neighbors.keys.forEach { neighbor in
                 if let weight = weightScheme.weight(from: node, to: neighbor) {
@@ -95,11 +95,6 @@ extension FlowNetwork {
             }
         }
     }
-}
-
-extension FlowNetwork {
-    
-    // MARK: - Mutating Methods
     
     mutating func reduceFlow(from start: Node, to end: Node, by amount: Double) {
         weights[start]![end]! -= amount

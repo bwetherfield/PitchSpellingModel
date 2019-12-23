@@ -161,7 +161,7 @@ class PitchSpellingNetworkTests: XCTestCase {
             .e
         ]
         let dyads = semitones + tones + minorThirds + majorThirds + perfectFourths
-        var invertingSpellingNetwork = InvertingSpellingNetwork(spellings: dyads)
+        let invertingSpellingNetwork = InvertingSpellingNetwork(spellings: dyads)
         let pairing = NetworkScheme<Int> { edge in
             switch (edge.a, edge.b) {
             case let (.internal(a), .internal(b)):
@@ -208,6 +208,54 @@ class PitchSpellingNetworkTests: XCTestCase {
         XCTAssertEqual(spelledPitches[0]!.spelling, .eFlat)
         XCTAssertEqual(spelledPitches[1]!.spelling, .bFlat)
         XCTAssertEqual(spelledPitches[2]!.spelling, .d)
+    }
+    
+    func testSimplePairwiseMasking() {
+        let semitones: [Int: Pitch] = [
+            0: 0,
+            1: 1,
+            2: 1,
+            3: 2,
+            4: 2,
+            5: 3,
+            6: 3,
+            7: 4,
+            8: 4,
+            9: 5,
+            10: 5,
+            11: 6,
+            12: 6,
+            13: 7
+        ]
+        let pitchSpellingNetwork = PitchSpellingNetwork(pitches: semitones, weightScheme: weightScheme!)
+        let pairing = FlowNetworkScheme<Int> { edge in
+            switch (edge.a, edge.b) {
+            case let (.internal(a), .internal(b)):
+                if ((a % 2 == 0) && (b % 2 == 1) && (b - 1 == a)) ||
+                    ((a % 2 == 1) && (b % 2 == 0) && (a - 1 == b)) {
+                    return 1
+                } else {
+                    return 0
+                }
+            default: return 1
+            }
+        }
+        pitchSpellingNetwork.mask(scheme: pairing) { $0 }
+        let spelledPitches = pitchSpellingNetwork.spell()
+        XCTAssertEqual(spelledPitches[0]!.spelling, .c)
+        XCTAssertEqual(spelledPitches[1]!.spelling, .dFlat)
+        XCTAssertEqual(spelledPitches[2]!.spelling, .cSharp)
+        XCTAssertEqual(spelledPitches[3]!.spelling, .d)
+        XCTAssertEqual(spelledPitches[4]!.spelling, .d)
+        XCTAssertEqual(spelledPitches[5]!.spelling, .eFlat)
+        XCTAssertEqual(spelledPitches[6]!.spelling, .dSharp)
+        XCTAssertEqual(spelledPitches[7]!.spelling, .e)
+        XCTAssertEqual(spelledPitches[8]!.spelling, .e)
+        XCTAssertEqual(spelledPitches[9]!.spelling, .f)
+        XCTAssertEqual(spelledPitches[10]!.spelling, .f)
+        XCTAssertEqual(spelledPitches[11]!.spelling, .gFlat)
+        XCTAssertEqual(spelledPitches[12]!.spelling, .fSharp)
+        XCTAssertEqual(spelledPitches[13]!.spelling, .g)
     }
     
     override func tearDown() {
