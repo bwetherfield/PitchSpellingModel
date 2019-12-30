@@ -794,4 +794,28 @@ class InvertingSpellingNetworkTests: XCTestCase {
         XCTAssertEqual(spellings[1]!.spelling, .fSharp)
         XCTAssertEqual(spellings[2]!.spelling, .aSharp)
     }
+    
+    func testPitchSpellingNetworkFactoryMethodBuildWithNoIndices () {
+        let invertingSpellingNetwork = InvertingSpellingNetwork(spellings: [
+            1: Pitch.Spelling(.f,.sharp),
+            2: Pitch.Spelling(.a,.sharp),
+            ])
+        let factory = invertingSpellingNetwork.pitchSpellingNetworkFactory()
+        let pitchSpellingNetwork = factory.build(from: [6, 10])
+        let spellings = pitchSpellingNetwork.spell()
+        XCTAssertEqual(spellings[0]!.spelling, .fSharp)
+        XCTAssertEqual(spellings[1]!.spelling, .aSharp)
+    }
+    
+    func testPitchSpellingNetworkFactoryMethodBuildWithPartition () {
+        let invertingSpellingNetwork = InvertingSpellingNetwork(spellings: [
+            1: Pitch.Spelling(.f,.sharp),
+            2: Pitch.Spelling(.a,.sharp),
+            ])
+        let factory = invertingSpellingNetwork.pitchSpellingNetworkFactory()
+        let pitchSpellingNetwork = factory.build(from: [[6, 10]])
+        let spellings = pitchSpellingNetwork.spell()
+        XCTAssertEqual(spellings[0]!.spelling, .fSharp)
+        XCTAssertEqual(spellings[1]!.spelling, .aSharp)
+    }
 }
