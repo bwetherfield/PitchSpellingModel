@@ -79,14 +79,12 @@ class InvertingSpellingNetwork {
 extension InvertingSpellingNetwork {
     
     /// - Returns: A closure that generates a PitchSpellingNetwork from an indexed collection of `Pitch` values
-    public func pitchSpellingNetworkFactory () -> ([Int: Pitch]) -> PitchSpellingNetwork {
+    public func pitchSpellingNetworkFactory () -> PitchSpellingNetworkFactory {
         let weights = generateWeights()
-        return { pitches in
-            let weightScheme = FlowNetworkScheme { edge in
-                weights[.init(edge.a, edge.b)]
-            }
-            return PitchSpellingNetwork(pitches: pitches, weightScheme: weightScheme)
+        let weightScheme = FlowNetworkScheme { edge in
+            weights[.init(edge.a, edge.b)]
         }
+        return PitchSpellingNetworkFactory(weightScheme)
     }
 
     /// - Returns: A concrete distribution of weights to satisfy the weight relationships delimited by
