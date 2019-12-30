@@ -127,3 +127,26 @@ extension PitchSpellingNetwork {
         return try! pitch.spelled(with: spelling)
     }
 }
+
+extension PitchSpellingNetwork {
+    
+    func partition (via indices: [Int: Int]) {
+        let adjacencyScheme = FlowNetworkScheme<Int> { edge in
+            switch (edge.a, edge.b) {
+            case let (.internal(a), .internal(b)):
+                return (indices[a] == indices[b] ? 1 : 0)
+            default:
+                return 1
+            }
+        }
+        connect(via: adjacencyScheme)
+    }
+    
+    func connect(via scheme: FlowNetworkScheme<Int>) {
+        let mask: FlowNetworkScheme<Cross<Int, Tendency>>
+            = (scheme + FlowNetworkScheme<Int> { edge in
+                (edge.a == edge.b ? 1 : 0)
+                }).pullback { cross in cross.a }
+        flowNetwork.mask(mask)
+    }
+}
