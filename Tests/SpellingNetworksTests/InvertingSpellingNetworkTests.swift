@@ -788,8 +788,8 @@ class InvertingSpellingNetworkTests: XCTestCase {
             1: Pitch.Spelling(.f,.sharp),
             2: Pitch.Spelling(.a,.sharp),
             ])
-        let build = invertingSpellingNetwork.pitchSpellingNetworkFactory()
-        let pitchSpellingNetwork = build([1: 6, 2: 10])
+        let factory = invertingSpellingNetwork.pitchSpellingNetworkFactory()
+        let pitchSpellingNetwork = factory.build(from: [1: 6, 2: 10])
         let spellings = pitchSpellingNetwork.spell()
         XCTAssertEqual(spellings[1]!.spelling, .fSharp)
         XCTAssertEqual(spellings[2]!.spelling, .aSharp)
