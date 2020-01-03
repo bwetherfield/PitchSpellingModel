@@ -1034,39 +1034,53 @@ class InvertingSpellingNetworkTests: XCTestCase {
             .bFlat,
             .dFlat,
             ],
-//            [
-//            .fSharp,
-//            .aSharp,
-//            .cSharp,
-//            ],
-            [.gFlat,
-             .bFlat],
-            [.bFlat,
-             .dFlat],
-            [.gFlat,
-             .dFlat],
-            [.fSharp,
-             .aSharp],
-            [.aSharp,
-             .cSharp],
-            [.fSharp,
-             .cSharp]
+            [
+            .fSharp,
+            .aSharp,
+            .cSharp,
+            ],
         ]
-//            + dyads
+            + dyads
         )
-        let presetGrouping: [PitchedEdge: Set<PitchedEdge>] = [Set<PitchedEdge>]().reduce(into: [:]) {
-            running, set in
-            set.forEach {
-                if let current = running[$0] {
-                    running[$0] = current.union(set)
-                } else {
-                    running[$0] = set
-                }
-            }
-        }
-        let factory = invertingSpellingNetwork.pitchSpellingNetworkFactory()
-        let pitchSpellingNetwork = factory.build(from: [6,10,1])
+        let factory = invertingSpellingNetwork.pitchSpellingNetworkFactory(sets: [
+            [
+                PitchedEdge(.source, .internal(.init(1, .down))),
+                PitchedEdge(.source, .internal(.init(6, .down))),
+                PitchedEdge(.internal(.init(3, .up)), .sink),
+                PitchedEdge(.internal(.init(10, .up)), .sink),
+            ],
+            [
+                PitchedEdge(.internal(.init(1, .up)), .sink),
+                PitchedEdge(.internal(.init(6, .up)), .sink),
+                PitchedEdge(.source, .internal(.init(3, .down))),
+                PitchedEdge(.source, .internal(.init(10, .down))),
+            ],
+            [
+                PitchedEdge(.source, .internal(.init(4, .down))),
+                PitchedEdge(.source, .internal(.init(11, .down))),
+                PitchedEdge(.internal(.init(0, .up)), .sink),
+                PitchedEdge(.internal(.init(5, .up)), .sink),
+            ],
+            [
+                PitchedEdge(.internal(.init(4, .up)), .sink),
+                PitchedEdge(.internal(.init(11, .up)), .sink),
+                PitchedEdge(.source, .internal(.init(0, .down))),
+                PitchedEdge(.source, .internal(.init(5, .down))),
+            ],
+            [
+                PitchedEdge(.source, .internal(.init(2, .down))),
+                PitchedEdge(.internal(.init(2, .up)), .sink),
+                PitchedEdge(.source, .internal(.init(7, .down))),
+                PitchedEdge(.internal(.init(7, .up)), .sink),
+                PitchedEdge(.source, .internal(.init(9, .down))),
+                PitchedEdge(.internal(.init(9, .up)), .sink),
+            ]
+        ])
+        let pitchSpellingNetwork = factory.build(from: [6,10,1,0])
         let spellings = pitchSpellingNetwork.spell(preferring: .flats)
-        dump(spellings)
+        XCTAssertEqual(spellings[0]!.spelling, .gFlat)
+        XCTAssertEqual(spellings[1]!.spelling, .bFlat)
+        XCTAssertEqual(spellings[2]!.spelling, .dFlat)
+        XCTAssertEqual(spellings[3]!.spelling, .c)
     }
 }

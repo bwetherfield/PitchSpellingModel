@@ -80,8 +80,8 @@ extension InvertingSpellingNetwork {
     
     /// - Returns: A closure that generates a PitchSpellingNetwork from an indexed collection of `Pitch` values
     public func pitchSpellingNetworkFactory (
-        _ preset: Memo<PitchedEdge>? = nil,
-        _ sets: [Set<PitchedEdge>] = []
+        preset: Memo<PitchedEdge>? = nil,
+        sets: [Set<PitchedEdge>] = []
     ) -> PitchSpellingNetworkFactory {
         let groupScheme: [PitchedEdge: Set<PitchedEdge>] = sets.reduce(into: [:]) { running, set in
             set.forEach {
