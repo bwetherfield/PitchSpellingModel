@@ -91,37 +91,17 @@ extension InvertingSpellingNetwork {
     /// `weightDependencies` or `nil` if no such distribution is possible, i.e. there are cyclical
     /// dependencies between edge types. In the latter case, the spellings fed in are *inconsistent*.
     /// Weights are parametrized by `Pitch.Class` and `Tendency` values.
-    public func generateWeights () -> [PitchedEdge: Double] {
+    public func generateWeights (_ preset: Memo<PitchedEdge>? = nil) -> [PitchedEdge: Double] {
         let pitchedDependencies = findDependencies()
         if pitchedDependencies.containsCycle() {
             return generateWeightsFromCycles(pitchedDependencies)
         }
-        func dependeciesReducer (
-            _ weights: inout [PitchedEdge: Double],
-            _ dependency: (key: PitchedEdge, value: [PitchedEdge])
-            )
-        {
-            func recursiveReducer (
-                _ weights: inout [PitchedEdge: Double],
-                _ dependency: (key: PitchedEdge, value: [PitchedEdge])
-                ) -> Double
-            {
-                let weight = dependency.value.reduce(1.0) { result, edge in
-                    if let edgeWeight = weights[edge] { return result + edgeWeight }
-                    return (
-                        result +
-                            recursiveReducer(&weights, (key: edge, value: pitchedDependencies.adjacencies[edge]!))
-                    )
-                }
-                weights[dependency.key] = weight
-                return weight
-            }
-            let _ = recursiveReducer(&weights, dependency)
-        }
-        return pitchedDependencies.adjacencies.reduce(into: [:], dependeciesReducer)
+        return generateWeights(from: pitchedDependencies, using: preset)
     }
 
-    func generateWeightsFromCycles (_ dependencies: DiGraph<PitchedEdge>)
+    func generateWeightsFromCycles (
+        _ dependencies: DiGraph<PitchedEdge>,
+        _ preset: Memo<Set<PitchedEdge>>? = nil)
         -> [PitchedEdge: Double] {
             let directedAcyclicGraph = dependencies.DAGify()
             let groupedWeights: [Set<PitchedEdge>: Double] = generateWeights(from: directedAcyclicGraph)
@@ -134,7 +114,7 @@ extension InvertingSpellingNetwork {
 
     func generateWeights<Node> (
         from dependencies: DiGraph<Node>,
-        given preset: Memo<Node>? = nil
+        using preset: Memo<Node>? = nil
     ) -> [Node: Double] {
         func dependenciesReducer (
             _ weights: inout [Node: Double],
