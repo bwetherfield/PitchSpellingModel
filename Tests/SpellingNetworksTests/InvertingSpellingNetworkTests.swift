@@ -1054,6 +1054,16 @@ class InvertingSpellingNetworkTests: XCTestCase {
         ]
 //            + dyads
         )
+        let presetGrouping: [PitchedEdge: Set<PitchedEdge>] = [Set<PitchedEdge>]().reduce(into: [:]) {
+            running, set in
+            set.forEach {
+                if let current = running[$0] {
+                    running[$0] = current.union(set)
+                } else {
+                    running[$0] = set
+                }
+            }
+        }
         let factory = invertingSpellingNetwork.pitchSpellingNetworkFactory()
         let pitchSpellingNetwork = factory.build(from: [6,10,1])
         let spellings = pitchSpellingNetwork.spell(preferring: .flats)

@@ -81,8 +81,17 @@ extension InvertingSpellingNetwork {
     /// - Returns: A closure that generates a PitchSpellingNetwork from an indexed collection of `Pitch` values
     public func pitchSpellingNetworkFactory (
         _ preset: Memo<PitchedEdge>? = nil,
-        _ groupScheme: [PitchedEdge: Set<PitchedEdge>] = [:]
+        _ sets: [Set<PitchedEdge>] = []
     ) -> PitchSpellingNetworkFactory {
+        let groupScheme: [PitchedEdge: Set<PitchedEdge>] = sets.reduce(into: [:]) { running, set in
+            set.forEach {
+                if let current = running[$0] {
+                    running[$0] = current.union(set)
+                } else {
+                    running[$0] = set
+                }
+            }
+        }
         let weights = generateWeights(preset, groupScheme)
         let weightScheme = FlowNetworkScheme { edge in
             weights[.init(edge.a, edge.b)]
