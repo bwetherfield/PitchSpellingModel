@@ -37,7 +37,7 @@ extension DiGraph {
     // MARK: - Instance Methods
     
     // Tarjan's algorithm to find strongly connected components
-    func getStronglyConnectedComponent () -> (Node) -> Set<Node> {
+    func getStronglyConnectedComponents () -> [Node: Set<Node>] {
             
             func reducer(
                 _ map: inout [Node: Set<Node>],
@@ -92,19 +92,20 @@ extension DiGraph {
                 let _ = strongConnect(&map, &indexAt, &lowLinkAt, &counter, &stack, &stackSet, pair)
             }
             
-            let map = adjacencies.reduce(into: [:], reducer)
-            return { map[$0]! }
+            return adjacencies.reduce(into: [:], reducer)
     }
     
     // Group nodes according to the set-forming function `nodeClumper` and return the resulting
     // `AdjacencyList`, removing self-loops that arise.
-    func clumpify (using nodeClumper: @escaping (Node) -> Set<Node>) -> DiGraph<Set<Node>> {
+    func clumpify (using nodeClumper: [Node: Set<Node>]) -> DiGraph<Set<Node>> {
         return DiGraph<Set<Node>>(
             adjacencies.reduce(into: [Set<Node>: [Set<Node>]]()) { list, adjacencyPair in
                 let (node, adjacentNodes) = adjacencyPair
-                let clump = nodeClumper(node)
+                guard let clump = nodeClumper[node] else {
+                    return
+                }
                 let adjacentClumps = adjacentNodes.compactMap {
-                    clump.contains($0) ? nil : nodeClumper($0)
+                    clump.contains($0) ? nil : nodeClumper[$0]
                 }
                 if let existingList = list[clump] {
                     list[clump] = existingList + adjacentClumps
@@ -118,7 +119,7 @@ extension DiGraph {
     // by the implementation of Tarjan's algorithm, hence forming a Directed Acyclic Graph (DAG) version of
     // original `DirectedGraph` (`self`).
     public func DAGify () -> DiGraph<Set<Node>> {
-        return clumpify (using: getStronglyConnectedComponent())
+        return clumpify (using: getStronglyConnectedComponents())
     }
     
     // Determines whether the directed graph contains a cycle.
