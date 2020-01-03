@@ -97,12 +97,12 @@ extension InvertingSpellingNetwork {
     ) -> [PitchedEdge: Double] {
         let pitchedDependencies = findDependencies()
         if pitchedDependencies.containsCycle() || !groupScheme.isEmpty {
-            return generateWeightsFromCycles(pitchedDependencies, preset?.pullback(), groupScheme)
+            return generateWeightsFromClumpedGraph(pitchedDependencies, preset?.pullback(), groupScheme)
         }
         return generateWeights(from: pitchedDependencies, preset)
     }
 
-    func generateWeightsFromCycles (
+    func generateWeightsFromClumpedGraph (
         _ dependencies: DiGraph<PitchedEdge>,
         _ preset: Memo<Set<PitchedEdge>>? = nil,
         _ groupScheme: [PitchedEdge: Set<PitchedEdge>] = [:]
@@ -110,8 +110,8 @@ extension InvertingSpellingNetwork {
             let clumpScheme = dependencies
                 .getStronglyConnectedComponents()
                 .merging(groupScheme) { return $0.union($1) }
-            let directedAcyclicGraph = dependencies.clumpify(using: clumpScheme)
-            let groupedWeights: [Set<PitchedEdge>: Double] = generateWeights(from: directedAcyclicGraph)
+            let clumpedGraph = dependencies.clumpify(using: clumpScheme)
+            let groupedWeights: [Set<PitchedEdge>: Double] = generateWeights(from: clumpedGraph)
             return groupedWeights.reduce(into: [PitchedEdge: Double]()) { runningWeights, pair in
                 pair.key.forEach { pitchedEdge in
                     runningWeights[pitchedEdge] = pair.value
