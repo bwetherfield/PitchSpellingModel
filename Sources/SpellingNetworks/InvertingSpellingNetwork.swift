@@ -94,9 +94,9 @@ extension InvertingSpellingNetwork {
     public func generateWeights (_ preset: Memo<PitchedEdge>? = nil) -> [PitchedEdge: Double] {
         let pitchedDependencies = findDependencies()
         if pitchedDependencies.containsCycle() {
-            return generateWeightsFromCycles(pitchedDependencies)
+            return generateWeightsFromCycles(pitchedDependencies, preset?.pullback())
         }
-        return generateWeights(from: pitchedDependencies, using: preset)
+        return generateWeights(from: pitchedDependencies, preset)
     }
 
     func generateWeightsFromCycles (
@@ -114,7 +114,7 @@ extension InvertingSpellingNetwork {
 
     func generateWeights<Node> (
         from dependencies: DiGraph<Node>,
-        using preset: Memo<Node>? = nil
+        _ preset: Memo<Node>? = nil
     ) -> [Node: Double] {
         func dependenciesReducer (
             _ weights: inout [Node: Double],
