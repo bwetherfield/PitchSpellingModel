@@ -132,29 +132,43 @@ extension InvertingSpellingNetwork {
             }
     }
 
-    func generateWeights<Node> (from dependencies: DiGraph<Node>) -> [Node: Double] {
-        func dependeciesReducer (
+    func generateWeights<Node> (
+        from dependencies: DiGraph<Node>,
+        given preset: Memo<Node>? = nil
+    ) -> [Node: Double] {
+        func dependenciesReducer (
             _ weights: inout [Node: Double],
             _ dependency: (key: Node, value: [Node])
             )
         {
-            func recursiveReducer (
+            func getWeight (
                 _ weights: inout [Node: Double],
                 _ dependency: (key: Node, value: [Node])
                 ) -> Double
             {
-                let weight = dependency.value.reduce(1.0) { result, edge in
-                    if weights[edge] != nil { return result + weights[edge]! }
-                    return result + recursiveReducer(
-                        &weights, (key: edge, value: dependencies.adjacencies[edge]!)
-                    )
+                if let weight = weights[dependency.key] {
+                    return weight
                 }
+                let weight = preset?.weight(dependency.key) ??
+                    dependency.value.reduce(1.0) { result, edge in
+                        return result + getWeight(
+                            &weights, (key: edge, value: dependencies.adjacencies[edge]!)
+                        )
+                    }
                 weights[dependency.key] = weight
                 return weight
             }
-            let _ = recursiveReducer(&weights, dependency)
+            let _ = getWeight(&weights, dependency)
         }
-        return dependencies.adjacencies.reduce(into: [:], dependeciesReducer)
+        return dependencies.adjacencies.reduce(into: [:], dependenciesReducer)
+    }
+    
+    struct Memo<Node> {
+        let weight: (Node) -> Double?
+        
+        init(_ weight: @escaping (Node) -> Double?) {
+            self.weight = weight
+        }
     }
 
     /// - Returns: For each `Edge`, a `Set` of `Edge` values, the sum of whose weights the edge's weight
