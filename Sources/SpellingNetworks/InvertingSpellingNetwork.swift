@@ -356,3 +356,12 @@ extension InvertingSpellingNetwork {
         )
     }
 }
+
+extension InvertingSpellingNetwork.Memo where Node: Hashable {
+    func pullback() -> InvertingSpellingNetwork.Memo<Set<Node>> {
+        return InvertingSpellingNetwork.Memo<Set<Node>> ({
+            let representative = $0.first!
+            return self.weight(representative)
+        })
+    }
+}
