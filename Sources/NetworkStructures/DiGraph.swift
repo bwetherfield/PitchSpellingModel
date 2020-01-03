@@ -37,7 +37,7 @@ extension DiGraph {
     // MARK: - Instance Methods
     
     // Tarjan's algorithm to find strongly connected components
-    func getStronglyConnectedComponents () -> [Node: Set<Node>] {
+    public func getStronglyConnectedComponents () -> [Node: Set<Node>] {
             
             func reducer(
                 _ map: inout [Node: Set<Node>],
@@ -97,7 +97,7 @@ extension DiGraph {
     
     // Group nodes according to the set-forming function `nodeClumper` and return the resulting
     // `AdjacencyList`, removing self-loops that arise.
-    func clumpify (using nodeClumper: [Node: Set<Node>]) -> DiGraph<Set<Node>> {
+    public func clumpify (using nodeClumper: [Node: Set<Node>]) -> DiGraph<Set<Node>> {
         return DiGraph<Set<Node>>(
             adjacencies.reduce(into: [Set<Node>: [Set<Node>]]()) { list, adjacencyPair in
                 let (node, adjacentNodes) = adjacencyPair

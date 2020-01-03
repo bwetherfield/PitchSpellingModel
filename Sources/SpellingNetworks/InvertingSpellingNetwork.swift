@@ -91,19 +91,26 @@ extension InvertingSpellingNetwork {
     /// `weightDependencies` or `nil` if no such distribution is possible, i.e. there are cyclical
     /// dependencies between edge types. In the latter case, the spellings fed in are *inconsistent*.
     /// Weights are parametrized by `Pitch.Class` and `Tendency` values.
-    public func generateWeights (_ preset: Memo<PitchedEdge>? = nil) -> [PitchedEdge: Double] {
+    public func generateWeights (
+        _ preset: Memo<PitchedEdge>? = nil,
+        _ groupScheme: [PitchedEdge: Set<PitchedEdge>] = [:]
+    ) -> [PitchedEdge: Double] {
         let pitchedDependencies = findDependencies()
-        if pitchedDependencies.containsCycle() {
-            return generateWeightsFromCycles(pitchedDependencies, preset?.pullback())
+        if pitchedDependencies.containsCycle() || !groupScheme.isEmpty {
+            return generateWeightsFromCycles(pitchedDependencies, preset?.pullback(), groupScheme)
         }
         return generateWeights(from: pitchedDependencies, preset)
     }
 
     func generateWeightsFromCycles (
         _ dependencies: DiGraph<PitchedEdge>,
-        _ preset: Memo<Set<PitchedEdge>>? = nil)
-        -> [PitchedEdge: Double] {
-            let directedAcyclicGraph = dependencies.DAGify()
+        _ preset: Memo<Set<PitchedEdge>>? = nil,
+        _ groupScheme: [PitchedEdge: Set<PitchedEdge>] = [:]
+    ) -> [PitchedEdge: Double] {
+            let clumpScheme = dependencies
+                .getStronglyConnectedComponents()
+                .merging(groupScheme) { return $0.union($1) }
+            let directedAcyclicGraph = dependencies.clumpify(using: clumpScheme)
             let groupedWeights: [Set<PitchedEdge>: Double] = generateWeights(from: directedAcyclicGraph)
             return groupedWeights.reduce(into: [PitchedEdge: Double]()) { runningWeights, pair in
                 pair.key.forEach { pitchedEdge in
