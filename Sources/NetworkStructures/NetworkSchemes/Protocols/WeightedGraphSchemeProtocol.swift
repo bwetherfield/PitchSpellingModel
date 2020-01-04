@@ -14,6 +14,10 @@ public protocol WeightedGraphSchemeProtocol: GraphSchemeProtocol {
     
     init (_ weight: @escaping (Edge) -> Weight?)
     
+    func pullback <H> (_ f: @escaping (H.Node) -> Node) -> H where
+    H: WeightedGraphSchemeProtocol,
+    H.Weight == Weight
+    
     func weight (from start: Node, to end: Node) -> Weight?
 }
 

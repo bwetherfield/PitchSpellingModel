@@ -5,7 +5,9 @@
 //  Created by Benjamin Wetherfield on 8/28/19.
 //
 
-public protocol FlowNetworkSchemeProtocol: NetworkSchemeProtocol, WeightedGraphSchemeProtocol { }
+public protocol FlowNetworkSchemeProtocol: NetworkSchemeProtocol, WeightedGraphSchemeProtocol {
+    func pullback<H>(_ f: @escaping (H.InnerNode) -> InnerNode) -> H where H: FlowNetworkSchemeProtocol, H.Weight == Weight
+}
 
 extension FlowNetworkSchemeProtocol {
     public func pullback<H>(_ f: @escaping (H.InnerNode) -> InnerNode) -> H where H: FlowNetworkSchemeProtocol, H.Weight == Weight {

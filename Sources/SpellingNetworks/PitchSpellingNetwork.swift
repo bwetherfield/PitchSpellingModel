@@ -95,7 +95,7 @@ extension PitchSpellingNetwork {
     
     // Adjusts edge weights based on an external scaling rule
     func mask <T> (scheme: FlowNetworkScheme<T>, _ lens: @escaping (Int) -> T) {
-        _maskScheme *= scheme.pullback(lens).pullback { $0.a }
+        _maskScheme *= scheme.pullback { lens($0.a) }
     }
 
     /// - Returns: An array of `SpelledPitch` values with the same indices as the original
