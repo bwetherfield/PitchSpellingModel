@@ -174,5 +174,3 @@ extension PitchSpellingNetwork {
         flowNetwork.mask(mask)
     }
 }
-
-extension PitchSpellingNetwork.Node: Hashable {}
