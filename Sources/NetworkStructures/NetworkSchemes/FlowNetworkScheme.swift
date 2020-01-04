@@ -23,9 +23,3 @@ extension FlowNetworkScheme {
         self.weight = { weight[$0] }
     }
 }
-
-extension FlowNetworkScheme {
-    public func weight(from start: FlowNode<InnerNode>, to end: FlowNode<InnerNode>) -> Double? {
-        return weight(Edge(start, end))
-    }
-}

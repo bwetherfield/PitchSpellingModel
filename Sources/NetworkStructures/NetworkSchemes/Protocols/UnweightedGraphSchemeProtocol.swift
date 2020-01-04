@@ -8,11 +8,7 @@
 import DataStructures
 
 public protocol UnweightedGraphSchemeProtocol: GraphSchemeProtocol {
-    var contains: (Edge) -> Bool { get }
-    
     init (_ contains: @escaping (Edge) -> Bool)
-
-    func containsEdge (from start: Node, to end: Node) -> Bool
 }
 
 extension UnweightedGraphSchemeProtocol {
