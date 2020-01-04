@@ -13,6 +13,11 @@ import SpelledPitch
 
 class PitchSpellingNetwork {
     
+    enum Node {
+        case primary(Cross<Int, Tendency>)
+        case phantom(Cross<Pitch, Tendency>)
+    }
+    
     // MARK: - Instance Properties
     
     /// The `FlowNetwork` which will be manipulated in order to spell the unspelled `pitches`.
@@ -174,3 +179,5 @@ extension PitchSpellingNetwork {
         flowNetwork.mask(mask)
     }
 }
+
+extension PitchSpellingNetwork.Node: Hashable {}
