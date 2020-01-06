@@ -15,7 +15,36 @@ class PitchSpellingNetwork {
     
     enum Node {
         case primary(Cross<Int, Tendency>)
-        case phantom(Cross<Pitch, Tendency>)
+        case phantom(Cross<Pitch.Class, Tendency>)
+        
+        var primary: Cross<Int, Tendency>? {
+            switch self {
+            case .primary(let value):
+                return value
+            default:
+                return nil
+            }
+        }
+        
+        var phantom: Cross<Pitch.Class, Tendency>? {
+            switch self {
+            case .phantom(let value):
+                return value
+            default:
+                return nil
+            }
+        }
+        
+        static func bind (_ f: @escaping (Cross<Int, Tendency>) -> Cross<Pitch.Class, Tendency>)
+            ->  (Node) -> Cross<Pitch.Class, Tendency> {
+            return { switch $0 {
+            case .primary(let value):
+                return f(value)
+            case .phantom(let value):
+                return value
+                }
+            }
+        }
     }
     
     // MARK: - Instance Properties

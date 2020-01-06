@@ -25,4 +25,20 @@ extension UnweightedGraphSchemeProtocol {
     {
         return H { self.contains(Edge(f($0.a),f($0.b))) }
     }
+    
+    @inlinable
+    public func pullback <H> (_ path: KeyPath<H.Node, Node?>) -> H where
+        H: UnweightedGraphSchemeProtocol
+    {
+        return pullback { $0[keyPath: path] }
+    }
+    
+    @inlinable
+    public func pullback <H> (_ f: @escaping (H.Node) -> Node?) -> H where
+        H: UnweightedGraphSchemeProtocol
+    {
+        return H {
+            guard let a = f($0.a), let b = f($0.b) else { return false }
+            return self.contains(Edge(a, b)) }
+    }
 }

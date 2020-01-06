@@ -21,6 +21,20 @@ public func bind <S: Hashable, A: Hashable> (_ f: @escaping (S) -> A) -> (FlowNo
     }
 }
 
+public func bind <S: Hashable, A: Hashable> (_ f: @escaping (S) -> A?) -> (FlowNode<S>) -> FlowNode<A>? {
+    return { flowNodeS in
+        switch flowNodeS {
+        case .internal(let index):
+            guard let index = f(index) else { return nil }
+            return .internal(index)
+        case .source:
+            return .source
+        case .sink:
+            return .sink
+        }
+    }
+}
+
 extension FlowNode: Codable where Index: Codable {
     private enum CodingKeys: String, CodingKey {
         case external

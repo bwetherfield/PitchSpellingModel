@@ -22,4 +22,19 @@ extension FlowNetworkSchemeProtocol {
     {
         return pullback(bind(f))
     }
+    
+    @inlinable
+    public func pullback <H> (_ path: KeyPath<H.InnerNode, InnerNode?>) -> H where
+        H: FlowNetworkSchemeProtocol,
+        H.Weight == Weight
+    {
+        return pullback { $0[keyPath: path] }
+    }
+    
+    @inlinable
+    public func pullback<H>(_ f: @escaping (H.InnerNode) -> InnerNode?) -> H where H: FlowNetworkSchemeProtocol,
+        H.Weight == Weight
+    {
+        return pullback(bind(f))
+    }
 }
