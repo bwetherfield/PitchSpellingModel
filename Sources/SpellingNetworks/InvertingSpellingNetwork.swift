@@ -226,7 +226,7 @@ extension InvertingSpellingNetwork {
     
     func connect(via scheme: NetworkScheme<Int>) {
         let temp: NetworkScheme<Cross<Int, Tendency>>
-            = (scheme + NetworkScheme<Int> { edge in edge.a == edge.b }).pullback { cross in cross.a }
+            = (scheme + NetworkScheme<Int> { edge in edge.a == edge.b }).pullback(get(\Cross.a))
         let mask: NetworkScheme<AssignedInnerNode> = temp.pullback { node in node.index }
         network.mask(mask)
     }

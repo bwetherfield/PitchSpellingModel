@@ -205,7 +205,7 @@ extension PitchSpellingNetwork {
         let mask: FlowNetworkScheme<Cross<Index, Tendency>>
             = (scheme + FlowNetworkScheme<Int> { edge in
                 (edge.a == edge.b ? 1 : 0)
-                }).pullback ({ cross in cross.a } >>> get(\Index.primary))
+                }).pullback (get(\Cross.a) >>> get(\Index.primary))
         flowNetwork.mask(mask)
     }
 }
