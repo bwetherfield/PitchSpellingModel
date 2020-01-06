@@ -49,10 +49,10 @@ class InvertingSpellingNetwork {
         let specificEdgeScheme: NetworkScheme<UnassignedInnerNode> =
             (Connect.sameTendenciesAppropriately +
                 Connect.differentTendenciesAppropriately).pullback(nodeMapper)
-            * Connect.differentInts
+            * Connect.differentIndices()
 
         let sameIntEdgesScheme: NetworkScheme<UnassignedInnerNode> =
-            Connect.upToDown * Connect.sameInts
+            Connect.upToDown() * Connect.sameIndices()
 
         let specificSourceScheme: NetworkScheme<UnassignedInnerNode> =
             Connect.sourceToDown.pullback(nodeMapper)

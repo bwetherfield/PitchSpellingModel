@@ -77,40 +77,16 @@ class PitchSpellingNetwork {
             guard let pitchClass = pitch(cross.a)?.class else { return nil }
             return Cross(pitchClass, cross.b)
         }
-        let differentIndices: NetworkScheme<Cross<Index, Tendency>> =
-        NetworkScheme<Index> { edge in
-            switch (edge.a, edge.b) {
-            case let (.internal(a), .internal(b)):
-                return a != b
-            default:
-                return false
-            }
-            }.pullback { node in node.a }
         let differentIntScheme: FlowNetworkScheme<Cross<Index, Tendency>> =
              weightScheme.pullback(pitchClassMap)
                  * (
-                     differentIndices
+                    Connect.differentIndices()
                          + (Connect.sourceToDown + Connect.upToSink).pullback(pitchClassMap)
          )
-        let sameInts: NetworkScheme<Cross<Index, Tendency>> =
-        NetworkScheme<Index> { edge in
-            switch (edge.a, edge.b) {
-            case let (.internal(a), .internal(b)):
-                return a == b
-            default:
-                return false
-            }
-            }.pullback { node in node.a }
-        let upToDown: NetworkScheme<Cross<Index, Tendency>> =
-        NetworkScheme<Tendency> { edge in
-            switch (edge.a, edge.b) {
-            case let (.internal(a), .internal(b)):
-                return a == .up && b == .down
-            default:
-                return false
-            }
-            }.pullback { node in node.b }
-        let sameIndexScheme: FlowNetworkScheme<Cross<Index, Tendency>> = Double.infinity * (sameInts * upToDown)
+        let sameIndices: NetworkScheme<Cross<Index, Tendency>> = Connect.sameIndices()
+        let upToDown: NetworkScheme<Cross<Index, Tendency>> = Connect.upToDown()
+        let sameIndexScheme: FlowNetworkScheme<Cross<Index, Tendency>> =
+            Double.infinity * (sameIndices * upToDown)
         let combinedScheme: FlowNetworkScheme<Cross<Index, Tendency>> = sameIndexScheme + differentIntScheme
         self.flowNetwork = FlowNetwork(
             nodes: nodes + phantoms,

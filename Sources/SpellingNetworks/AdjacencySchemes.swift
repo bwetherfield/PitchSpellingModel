@@ -21,8 +21,9 @@ struct AdjacencySchemes {
     
     /// Adjacency scheme that connects `.up` tendencies to `.down` tendencies
     // for sameInts
-    static let upToDown: NetworkScheme<UnassignedInnerNode> =
-        NetworkScheme<Tendency>(bind { edge in edge.a == .up && edge.b == .down }).pullback { node in node.b }
+    static func upToDown <Index: Hashable> () -> NetworkScheme<Cross<Index, Tendency>> {
+        return NetworkScheme<Tendency>(bind { edge in edge.a == .up && edge.b == .down }).pullback { node in node.b }
+    }
     
     /// Adjacency scheme that connects `.source` to `.down` tendencies and not pitch class `8`
     static let sourceToDown: NetworkScheme<Cross<Pitch.Class, Tendency>> =
@@ -43,12 +44,14 @@ struct AdjacencySchemes {
                 }.pullback { cross in cross.b }
     
     /// Adjacency scheme that connects nodes with the same `int` value
-    static let sameInts: NetworkScheme<UnassignedInnerNode> =
-        NetworkScheme<Int> (bind { edge in edge.a == edge.b }).pullback { node in node.a }
+    static func sameIndices <Index: Hashable> () -> NetworkScheme<Cross<Index, Tendency>> {
+        return NetworkScheme<Index> (bind { edge in edge.a == edge.b }).pullback { node in node.a }
+    }
     
     /// Adjacency scheme that connects nodes with different `int` values
-    static let differentInts: NetworkScheme<UnassignedInnerNode> =
-        NetworkScheme<Int> (bind { edge in edge.a != edge.b }).pullback { node in node.a }
+    static func differentIndices <Index: Hashable> () -> NetworkScheme<Cross<Index, Tendency>> {
+        return NetworkScheme<Index> (bind { edge in edge.a != edge.b }).pullback { node in node.a }
+    }
     
     static var differentTendenciesAppropriately: NetworkScheme<Cross<Pitch.Class, Tendency>> {
         return connectDifferentTendencies * connectPitchClassesForDifferentTendencies
