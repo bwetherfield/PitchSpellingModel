@@ -69,7 +69,7 @@ class PitchSpellingNetwork {
             list.append(.init(.primary(int), .down))
             list.append(.init(.primary(int), .up))
         }
-        let phantoms: [Cross<Index, Tendency>] = phantomPitches.keys.reduce(into: []) { list, int in
+        let phantomPitches: [Cross<Index, Tendency>] = phantomPitches.keys.reduce(into: []) { list, int in
             list.append(.init(.phantom(int), .down))
             list.append(.init(.phantom(int), .up))
         }
@@ -89,7 +89,7 @@ class PitchSpellingNetwork {
             Double.infinity * (sameIndices * upToDown)
         let combinedScheme: FlowNetworkScheme<Cross<Index, Tendency>> = sameIndexScheme + differentIntScheme
         self.flowNetwork = FlowNetwork(
-            nodes: nodes + phantoms,
+            nodes: nodes + phantomPitches,
             scheme: combinedScheme)
         self.pitch = pitch
     }
