@@ -22,15 +22,7 @@ struct AdjacencySchemes {
     /// Adjacency scheme that connects `.up` tendencies to `.down` tendencies
     // for sameInts
     static let upToDown: NetworkScheme<UnassignedInnerNode> =
-        NetworkScheme<Tendency> { edge in
-            switch (edge.a, edge.b) {
-            case let (.internal(a), .internal(b)):
-                return a == .up && b == .down
-            default:
-                return false
-            }
-            }.pullback { node in node.b }
-    
+        NetworkScheme<Tendency>(bind { edge in edge.a == .up && edge.b == .down }).pullback { node in node.b }
     
     /// Adjacency scheme that connects `.source` to `.down` tendencies and not pitch class `8`
     static let sourceToDown: NetworkScheme<Cross<Pitch.Class, Tendency>> =
@@ -52,25 +44,11 @@ struct AdjacencySchemes {
     
     /// Adjacency scheme that connects nodes with the same `int` value
     static let sameInts: NetworkScheme<UnassignedInnerNode> =
-        NetworkScheme<Int> { edge in
-            switch (edge.a, edge.b) {
-            case let (.internal(a), .internal(b)):
-                return a == b
-            default:
-                return false
-            }
-            }.pullback { node in node.a }
+        NetworkScheme<Int> (bind { edge in edge.a == edge.b }).pullback { node in node.a }
     
     /// Adjacency scheme that connects nodes with different `int` values
     static let differentInts: NetworkScheme<UnassignedInnerNode> =
-        NetworkScheme<Int> { edge in
-            switch (edge.a, edge.b) {
-            case let (.internal(a), .internal(b)):
-                return a != b
-            default:
-                return false
-            }
-            }.pullback { node in node.a }
+        NetworkScheme<Int> (bind { edge in edge.a != edge.b }).pullback { node in node.a }
     
     static var differentTendenciesAppropriately: NetworkScheme<Cross<Pitch.Class, Tendency>> {
         return connectDifferentTendencies * connectPitchClassesForDifferentTendencies
@@ -82,51 +60,27 @@ struct AdjacencySchemes {
     
     /// Adjacency scheme that connects `.up` tendencies to `.down` tendencies and vice versa
     static let connectDifferentTendencies: NetworkScheme<Cross<Pitch.Class, Tendency>> =
-        NetworkScheme { edge in
-            switch (edge.a, edge.b) {
-            case let (.internal(source), .internal(destination)):
-                return (
-                    source.b != destination.b
-                        && PitchClassesForDifferentTendenciesLookup.contains(.init(source.a, destination.a))
-                )
-            default:
-                return false
-            }
-    }
+        NetworkScheme (bind { edge in
+            edge.a.b != edge.b.b
+                && PitchClassesForDifferentTendenciesLookup.contains(.init(edge.a.a, edge.b.a))
+            })
     
     /// Adjacency scheme that connects nodes with the same tendency
     static let connectSameTendencies: NetworkScheme<Cross<Pitch.Class, Tendency>> =
-        NetworkScheme { edge in
-            switch (edge.a, edge.b) {
-            case (.internal(let source), .internal(let destination)):
-                return (
-                    source.b == destination.b
-                        && !PitchClassesForDifferentTendenciesLookup.contains(.init(source.a, destination.a))
-                )
-            default:
-                return false
-            }
-    }
+        NetworkScheme (bind { edge in
+        edge.a.b == edge.b.b
+            && !PitchClassesForDifferentTendenciesLookup.contains(.init(edge.a.a, edge.b.a))
+        })
     
     static let connectPitchClassesForDifferentTendencies: NetworkScheme<Cross<Pitch.Class, Tendency>> =
-        NetworkScheme { edge in
-            switch (edge.a, edge.b) {
-            case let (.internal(source), .internal(destination)):
-                return PitchClassesForDifferentTendenciesLookup.contains(.init(source.a, destination.a))
-            default:
-                return false
-            }
-    }
+        NetworkScheme (bind { edge in
+            PitchClassesForDifferentTendenciesLookup.contains(.init(edge.a.a, edge.b.a))
+        })
     
     static let connectPitchClassesForSameTendencies: NetworkScheme<Cross<Pitch.Class, Tendency>> =
-        NetworkScheme { edge in
-            switch (edge.a, edge.b) {
-            case let (.internal(source), .internal(destination)):
-                return !PitchClassesForDifferentTendenciesLookup.contains(.init(source.a, destination.a))
-            default:
-                return false
-            }
-    }
+        NetworkScheme (bind { edge in
+            return !PitchClassesForDifferentTendenciesLookup.contains(.init(edge.a.a, edge.b.a))
+        })
     
     /// Pairs of pitch classes that have a different skew, such that `ModifierDirection.neutral` for one node is
     /// sharp or 'up' in absolute terms and for the other node it is down
