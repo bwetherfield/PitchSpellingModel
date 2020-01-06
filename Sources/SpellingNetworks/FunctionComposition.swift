@@ -17,3 +17,7 @@ public func >>> <A, B, C> (a2b: @escaping (A) -> B?, b2c: @escaping (B) -> C) ->
         return b2c(b)
     }
 }
+
+public func || <A, B> (first: @escaping (A) -> B?, second: @escaping (A) -> B?) -> (A) -> B? {
+    return { first($0) ?? second($0) }
+}
