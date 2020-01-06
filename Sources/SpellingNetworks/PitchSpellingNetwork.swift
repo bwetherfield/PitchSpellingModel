@@ -13,11 +13,11 @@ import SpelledPitch
 
 class PitchSpellingNetwork {
     
-    enum Node {
-        case primary(Cross<Int, Tendency>)
-        case phantom(Cross<Pitch.Class, Tendency>)
+    enum Index {
+        case primary(Int)
+        case phantom(Int)
         
-        var primary: Cross<Int, Tendency>? {
+        var primary: Int? {
             switch self {
             case .primary(let value):
                 return value
@@ -26,7 +26,7 @@ class PitchSpellingNetwork {
             }
         }
         
-        var phantom: Cross<Pitch.Class, Tendency>? {
+        var phantom: Int? {
             switch self {
             case .phantom(let value):
                 return value
@@ -34,17 +34,17 @@ class PitchSpellingNetwork {
                 return nil
             }
         }
-        
-        static func bind (_ f: @escaping (Cross<Int, Tendency>) -> Cross<Pitch.Class, Tendency>)
-            ->  (Node) -> Cross<Pitch.Class, Tendency> {
-            return { switch $0 {
-            case .primary(let value):
-                return f(value)
-            case .phantom(let value):
-                return value
-                }
-            }
-        }
+//
+//        static func bind (_ f: @escaping (Cross<Int, Tendency>) -> Cross<Pitch.Class, Tendency>)
+//            ->  (Node) -> Cross<Pitch.Class, Tendency> {
+//            return { switch $0 {
+//            case .primary(let value):
+//                return f(value)
+//            case .phantom(let value):
+//                return value
+//                }
+//            }
+//        }
     }
     
     // MARK: - Instance Properties
@@ -209,4 +209,4 @@ extension PitchSpellingNetwork {
     }
 }
 
-extension PitchSpellingNetwork.Node: Hashable {}
+extension PitchSpellingNetwork.Index: Hashable {}
