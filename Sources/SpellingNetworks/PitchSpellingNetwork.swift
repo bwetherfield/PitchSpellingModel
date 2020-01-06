@@ -34,23 +34,28 @@ class PitchSpellingNetwork {
                 return nil
             }
         }
+        
+        static func downCast(_ node: Cross<Index,Tendency>) -> Cross<Int, Tendency>? {
+            guard let int = node.a.primary else { return nil }
+            return Cross(int, node.b)
+        }
     }
     
     // MARK: - Instance Properties
     
     /// The `FlowNetwork` which will be manipulated in order to spell the unspelled `pitches`.
-    var flowNetwork: FlowNetwork<Cross<Int,Tendency>>
+    var flowNetwork: FlowNetwork<Cross<Index,Tendency>>
         
     /// The unspelled `Pitch` values to be spelled.
-    let pitch: (Int) -> Pitch
+    let pitch: (Index) -> Pitch?
     
     /// The masking scheme to be applied before spelling
-    private var maskScheme: FlowNetworkScheme<Cross<Int,Tendency>>? = nil
+    private var maskScheme: FlowNetworkScheme<Cross<Index,Tendency>>? = nil
     
     /// The underlying implementation of `maskScheme`
-    private var _maskScheme: FlowNetworkScheme<Cross<Int,Tendency>> {
+    private var _maskScheme: FlowNetworkScheme<Cross<Index,Tendency>> {
         get {
-            return maskScheme ?? FlowNetworkScheme<Cross<Int, Tendency>> { _ in 1 }
+            return maskScheme ?? FlowNetworkScheme<Cross<Index, Tendency>> { _ in 1 }
         }
         set {
             maskScheme = newValue
@@ -58,14 +63,9 @@ class PitchSpellingNetwork {
     }
     
     init(pitches: [Int: Pitch], weightScheme: FlowNetworkScheme<Cross<Pitch.Class, Tendency>>, phantomPitches: [Int: Pitch] = [:]) {
-        let pitch = { pitches[$0]! }
-        let pitch2: (Index) -> Pitch? =
+        let pitch: (Index) -> Pitch? =
             get(\Index.primary) >>> { pitches[$0] } ||| get(\Index.phantom) >>> { phantomPitches[$0] }
-        let nodes: [Cross<Int, Tendency>] = pitches.keys.reduce(into: []) { list, int in
-            list.append(.init(int, .down))
-            list.append(.init(int, .up))
-        }
-        let nodes2: [Cross<Index, Tendency>] = pitches.keys.reduce(into: []) { list, int in
+        let nodes: [Cross<Index, Tendency>] = pitches.keys.reduce(into: []) { list, int in
             list.append(.init(.primary(int), .down))
             list.append(.init(.primary(int), .up))
         }
@@ -73,21 +73,11 @@ class PitchSpellingNetwork {
             list.append(.init(.phantom(int), .down))
             list.append(.init(.phantom(int), .up))
         }
-        let pitchClassMap: (Cross<Int, Tendency>) -> Cross<Pitch.Class, Tendency> = { cross in
-            let pitchClass = pitch(cross.a).class
+        let pitchClassMap: (Cross<Index, Tendency>) -> Cross<Pitch.Class, Tendency>? = { cross in
+            guard let pitchClass = pitch(cross.a)?.class else { return nil }
             return Cross(pitchClass, cross.b)
         }
-        let pitchClassMap2: (Cross<Index, Tendency>) -> Cross<Pitch.Class, Tendency>? = { cross in
-            guard let pitchClass = pitch2(cross.a)?.class else { return nil }
-            return Cross(pitchClass, cross.b)
-        }
-        let differentIntScheme: FlowNetworkScheme<Cross<Int, Tendency>> =
-            weightScheme.pullback(pitchClassMap)
-                * (
-                    Connect.differentInts
-                        + (Connect.sourceToDown + Connect.upToSink).pullback(pitchClassMap)
-        )
-        let differentIndices2: NetworkScheme<Cross<Index, Tendency>> =
+        let differentIndices: NetworkScheme<Cross<Index, Tendency>> =
         NetworkScheme<Index> { edge in
             switch (edge.a, edge.b) {
             case let (.internal(a), .internal(b)):
@@ -96,13 +86,12 @@ class PitchSpellingNetwork {
                 return false
             }
             }.pullback { node in node.a }
-        let differentIntScheme2: FlowNetworkScheme<Cross<Index, Tendency>> =
-             weightScheme.pullback(pitchClassMap2)
+        let differentIntScheme: FlowNetworkScheme<Cross<Index, Tendency>> =
+             weightScheme.pullback(pitchClassMap)
                  * (
-                     differentIndices2
-                         + (Connect.sourceToDown + Connect.upToSink).pullback(pitchClassMap2)
+                     differentIndices
+                         + (Connect.sourceToDown + Connect.upToSink).pullback(pitchClassMap)
          )
-        let sameIntScheme: FlowNetworkScheme<Cross<Int, Tendency>> = Double.infinity * (Connect.sameInts * Connect.upToDown)
         let sameInts: NetworkScheme<Cross<Index, Tendency>> =
         NetworkScheme<Index> { edge in
             switch (edge.a, edge.b) {
@@ -121,16 +110,11 @@ class PitchSpellingNetwork {
                 return false
             }
             }.pullback { node in node.b }
-        let sameIndexScheme2: FlowNetworkScheme<Cross<Index, Tendency>> = Double.infinity * (sameInts * upToDown)
-        let combinedScheme: FlowNetworkScheme<Cross<Int, Tendency>> = sameIntScheme + differentIntScheme
-        let combinedScheme2: FlowNetworkScheme<Cross<Index, Tendency>> = sameIndexScheme2 + differentIntScheme2
+        let sameIndexScheme: FlowNetworkScheme<Cross<Index, Tendency>> = Double.infinity * (sameInts * upToDown)
+        let combinedScheme: FlowNetworkScheme<Cross<Index, Tendency>> = sameIndexScheme + differentIntScheme
         self.flowNetwork = FlowNetwork(
-            nodes: nodes,
-            scheme: combinedScheme
-            )
-        let flowNetwork2 = FlowNetwork(
-            nodes: nodes2 + phantoms,
-            scheme: combinedScheme2)
+            nodes: nodes + phantoms,
+            scheme: combinedScheme)
         self.pitch = pitch
     }
     
@@ -170,7 +154,7 @@ extension PitchSpellingNetwork {
     
     // Adjusts edge weights based on an external scaling rule
     func mask <T> (scheme: FlowNetworkScheme<T>, _ lens: @escaping (Int) -> T) {
-        _maskScheme *= scheme.pullback { lens($0.a) }
+        _maskScheme *= scheme.pullback( Index.downCast >>> { lens($0.a) })
     }
 
     /// - Returns: An array of `SpelledPitch` values with the same indices as the original
@@ -182,16 +166,16 @@ extension PitchSpellingNetwork {
         }
         var assignedNodes: [AssignedNode] {
             var (sourceSide, sinkSide): (
-            Set<FlowNode<Cross<Int, Tendency>>>,
-            Set<FlowNode<Cross<Int, Tendency>>>
+            Set<FlowNode<Cross<Index, Tendency>>>,
+            Set<FlowNode<Cross<Index, Tendency>>>
             )
             (sourceSide, sinkSide) = (preference == .sharps) ? flowNetwork.sinkWeightedMinimumCut : flowNetwork.sourceWeightedMinimumCut
-            let downNodes: [AssignedNode] = sourceSide.map(bind { index in
+            let downNodes: [AssignedNode] = sourceSide.compactMap(bind(Index.downCast >>> { index in
                 .init(index: index, assignment: .down)
-            })
-            let upNodes: [AssignedNode] = sinkSide.map(bind { index in
+            }))
+            let upNodes: [AssignedNode] = sinkSide.compactMap(bind(Index.downCast >>> { index in
                 .init(index: index, assignment: .up)
-            })
+            }))
             return downNodes + upNodes
         }
         return assignedNodes
@@ -220,7 +204,7 @@ extension PitchSpellingNetwork {
         _ down: AssignedInnerNode
         ) -> SpelledPitch
     {
-        let pitch = self.pitch(up.index.a)
+        let pitch = self.pitch(.primary(up.index.a))!
         let tendencies = TendencyPair(up.assignment, down.assignment)
         let spelling = Pitch.Spelling(pitchClass: pitch.class, tendencies: tendencies)!
         return try! pitch.spelled(with: spelling)
@@ -242,10 +226,10 @@ extension PitchSpellingNetwork {
     }
     
     func connect(via scheme: FlowNetworkScheme<Int>) {
-        let mask: FlowNetworkScheme<Cross<Int, Tendency>>
+        let mask: FlowNetworkScheme<Cross<Index, Tendency>>
             = (scheme + FlowNetworkScheme<Int> { edge in
                 (edge.a == edge.b ? 1 : 0)
-                }).pullback { cross in cross.a }
+                }).pullback ({ cross in cross.a } >>> get(\Index.primary))
         flowNetwork.mask(mask)
     }
 }
