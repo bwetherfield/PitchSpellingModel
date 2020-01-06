@@ -34,17 +34,6 @@ class PitchSpellingNetwork {
                 return nil
             }
         }
-//
-//        static func bind (_ f: @escaping (Cross<Int, Tendency>) -> Cross<Pitch.Class, Tendency>)
-//            ->  (Node) -> Cross<Pitch.Class, Tendency> {
-//            return { switch $0 {
-//            case .primary(let value):
-//                return f(value)
-//            case .phantom(let value):
-//                return value
-//                }
-//            }
-//        }
     }
     
     // MARK: - Instance Properties
@@ -68,14 +57,28 @@ class PitchSpellingNetwork {
         }
     }
     
-    init(pitches: [Int: Pitch], weightScheme: FlowNetworkScheme<Cross<Pitch.Class, Tendency>>) {
+    init(pitches: [Int: Pitch], weightScheme: FlowNetworkScheme<Cross<Pitch.Class, Tendency>>, phantomPitches: [Int: Pitch] = [:]) {
         let pitch = { pitches[$0]! }
+        let pitch2: (Index) -> Pitch? =
+            get(\Index.primary) >>> { pitches[$0] } ||| get(\Index.phantom) >>> { phantomPitches[$0] }
         let nodes: [Cross<Int, Tendency>] = pitches.keys.reduce(into: []) { list, int in
             list.append(.init(int, .down))
             list.append(.init(int, .up))
         }
+        let nodes2: [Cross<Index, Tendency>] = pitches.keys.reduce(into: []) { list, int in
+            list.append(.init(.primary(int), .down))
+            list.append(.init(.primary(int), .up))
+        }
+        let phantoms: [Cross<Index, Tendency>] = phantomPitches.keys.reduce(into: []) { list, int in
+            list.append(.init(.phantom(int), .down))
+            list.append(.init(.phantom(int), .up))
+        }
         let pitchClassMap: (Cross<Int, Tendency>) -> Cross<Pitch.Class, Tendency> = { cross in
             let pitchClass = pitch(cross.a).class
+            return Cross(pitchClass, cross.b)
+        }
+        let pitchClassMap2: (Cross<Index, Tendency>) -> Cross<Pitch.Class, Tendency>? = { cross in
+            guard let pitchClass = pitch2(cross.a)?.class else { return nil }
             return Cross(pitchClass, cross.b)
         }
         let differentIntScheme: FlowNetworkScheme<Cross<Int, Tendency>> =
@@ -84,12 +87,50 @@ class PitchSpellingNetwork {
                     Connect.differentInts
                         + (Connect.sourceToDown + Connect.upToSink).pullback(pitchClassMap)
         )
+        let differentIndices2: NetworkScheme<Cross<Index, Tendency>> =
+        NetworkScheme<Index> { edge in
+            switch (edge.a, edge.b) {
+            case let (.internal(a), .internal(b)):
+                return a != b
+            default:
+                return false
+            }
+            }.pullback { node in node.a }
+        let differentIntScheme2: FlowNetworkScheme<Cross<Index, Tendency>> =
+             weightScheme.pullback(pitchClassMap2)
+                 * (
+                     differentIndices2
+                         + (Connect.sourceToDown + Connect.upToSink).pullback(pitchClassMap2)
+         )
         let sameIntScheme: FlowNetworkScheme<Cross<Int, Tendency>> = Double.infinity * (Connect.sameInts * Connect.upToDown)
+        let sameInts: NetworkScheme<Cross<Index, Tendency>> =
+        NetworkScheme<Index> { edge in
+            switch (edge.a, edge.b) {
+            case let (.internal(a), .internal(b)):
+                return a == b
+            default:
+                return false
+            }
+            }.pullback { node in node.a }
+        let upToDown: NetworkScheme<Cross<Index, Tendency>> =
+        NetworkScheme<Tendency> { edge in
+            switch (edge.a, edge.b) {
+            case let (.internal(a), .internal(b)):
+                return a == .up && b == .down
+            default:
+                return false
+            }
+            }.pullback { node in node.b }
+        let sameIndexScheme2: FlowNetworkScheme<Cross<Index, Tendency>> = Double.infinity * (sameInts * upToDown)
         let combinedScheme: FlowNetworkScheme<Cross<Int, Tendency>> = sameIntScheme + differentIntScheme
+        let combinedScheme2: FlowNetworkScheme<Cross<Index, Tendency>> = sameIndexScheme2 + differentIntScheme2
         self.flowNetwork = FlowNetwork(
             nodes: nodes,
             scheme: combinedScheme
             )
+        let flowNetwork2 = FlowNetwork(
+            nodes: nodes2 + phantoms,
+            scheme: combinedScheme2)
         self.pitch = pitch
     }
     
