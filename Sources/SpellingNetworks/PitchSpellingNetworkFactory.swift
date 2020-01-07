@@ -18,15 +18,23 @@ class PitchSpellingNetworkFactory {
         self.weightScheme = weightScheme
     }
     
-    func build (from pitches: [Int: Pitch], withPhantomPitches phantomPitches: [Int: Pitch] = [:]) -> PitchSpellingNetwork {
-        return PitchSpellingNetwork(pitches: pitches, weightScheme: weightScheme, phantomPitches: phantomPitches)
+    func build (from pitches: [Int: Pitch], withPhantomPitches phantomPitches: [Pitch] = []) -> PitchSpellingNetwork {
+        return PitchSpellingNetwork(pitches: pitches, weightScheme: weightScheme, phantomPitches: index(phantomPitches))
     }
     
-    func build (from pitches: [[Pitch]], withPhantomPitches phantomPitches: [Int: Pitch] = [:]) -> PitchSpellingNetwork {
-        return PitchSpellingNetwork(pitches: pitches, weightScheme: weightScheme, phantomPitches: phantomPitches)
+    func build (from pitches: [[Pitch]], withPhantomPitches phantomPitches: [Pitch] = []) -> PitchSpellingNetwork {
+        return PitchSpellingNetwork(pitches: pitches, weightScheme: weightScheme, phantomPitches: index(phantomPitches))
     }
     
-    func build (from pitches: [Pitch], withPhantomPitches phantomPitches: [Int: Pitch] = [:]) -> PitchSpellingNetwork {
-        return PitchSpellingNetwork(pitches: pitches, weightScheme: weightScheme, phantomPitches: phantomPitches)
+    func build (from pitches: [Pitch], withPhantomPitches phantomPitches: [Pitch] = []) -> PitchSpellingNetwork {
+        return PitchSpellingNetwork(pitches: pitches, weightScheme: weightScheme, phantomPitches: index(phantomPitches))
+    }
+    
+    func index(_ pitches: [Pitch]) -> [Int: Pitch] {
+        let indexed: [Int: Pitch] = pitches.enumerated().reduce(into: [:]) { indexedPitches, indexedPitch in
+            let (index, pitch) = indexedPitch
+            indexedPitches[index] = pitch
+        }
+        return indexed
     }
 }
