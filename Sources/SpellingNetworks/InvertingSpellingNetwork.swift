@@ -49,10 +49,10 @@ class InvertingSpellingNetwork {
         let specificEdgeScheme: NetworkScheme<UnassignedInnerNode> =
             (Connect.sameTendenciesAppropriately +
                 Connect.differentTendenciesAppropriately).pullback(nodeMapper)
-            * Connect.differentInts
+            * Connect.differentIndices()
 
         let sameIntEdgesScheme: NetworkScheme<UnassignedInnerNode> =
-            Connect.upToDown * Connect.sameInts
+            Connect.upToDown() * Connect.sameIndices()
 
         let specificSourceScheme: NetworkScheme<UnassignedInnerNode> =
             Connect.sourceToDown.pullback(nodeMapper)
@@ -79,54 +79,51 @@ class InvertingSpellingNetwork {
 extension InvertingSpellingNetwork {
     
     /// - Returns: A closure that generates a PitchSpellingNetwork from an indexed collection of `Pitch` values
-    public func pitchSpellingNetworkFactory () -> ([Int: Pitch]) -> PitchSpellingNetwork {
-        let weights = generateWeights()
-        return { pitches in
-            let weightScheme = FlowNetworkScheme { edge in
-                weights[.init(edge.a, edge.b)]
+    public func pitchSpellingNetworkFactory (
+        preset: Memo<PitchedEdge>? = nil,
+        sets: [Set<PitchedEdge>] = []
+    ) -> PitchSpellingNetworkFactory {
+        let groupScheme: [PitchedEdge: Set<PitchedEdge>] = sets.reduce(into: [:]) { running, set in
+            set.forEach {
+                if let current = running[$0] {
+                    running[$0] = current.union(set)
+                } else {
+                    running[$0] = set
+                }
             }
-            return PitchSpellingNetwork(pitches: pitches, weightScheme: weightScheme)
         }
+        let weights = generateWeights(preset, groupScheme)
+        let weightScheme = FlowNetworkScheme { edge in
+            weights[.init(edge.a, edge.b)]
+        }
+        return PitchSpellingNetworkFactory(weightScheme)
     }
 
     /// - Returns: A concrete distribution of weights to satisfy the weight relationships delimited by
     /// `weightDependencies` or `nil` if no such distribution is possible, i.e. there are cyclical
     /// dependencies between edge types. In the latter case, the spellings fed in are *inconsistent*.
     /// Weights are parametrized by `Pitch.Class` and `Tendency` values.
-    public func generateWeights () -> [PitchedEdge: Double] {
+    public func generateWeights (
+        _ preset: Memo<PitchedEdge>? = nil,
+        _ groupScheme: [PitchedEdge: Set<PitchedEdge>] = [:]
+    ) -> [PitchedEdge: Double] {
         let pitchedDependencies = findDependencies()
-        if pitchedDependencies.containsCycle() {
-            return generateWeightsFromCycles(pitchedDependencies)
+        if pitchedDependencies.containsCycle() || !groupScheme.isEmpty {
+            return generateWeightsFromClumpedGraph(pitchedDependencies, preset?.pullback(), groupScheme)
         }
-        func dependeciesReducer (
-            _ weights: inout [PitchedEdge: Double],
-            _ dependency: (key: PitchedEdge, value: [PitchedEdge])
-            )
-        {
-            func recursiveReducer (
-                _ weights: inout [PitchedEdge: Double],
-                _ dependency: (key: PitchedEdge, value: [PitchedEdge])
-                ) -> Double
-            {
-                let weight = dependency.value.reduce(1.0) { result, edge in
-                    if let edgeWeight = weights[edge] { return result + edgeWeight }
-                    return (
-                        result +
-                            recursiveReducer(&weights, (key: edge, value: pitchedDependencies.adjacencies[edge]!))
-                    )
-                }
-                weights[dependency.key] = weight
-                return weight
-            }
-            let _ = recursiveReducer(&weights, dependency)
-        }
-        return pitchedDependencies.adjacencies.reduce(into: [:], dependeciesReducer)
+        return generateWeights(from: pitchedDependencies, preset)
     }
 
-    func generateWeightsFromCycles (_ dependencies: DiGraph<PitchedEdge>)
-        -> [PitchedEdge: Double] {
-            let directedAcyclicGraph = dependencies.DAGify()
-            let groupedWeights: [Set<PitchedEdge>: Double] = generateWeights(from: directedAcyclicGraph)
+    func generateWeightsFromClumpedGraph (
+        _ dependencies: DiGraph<PitchedEdge>,
+        _ preset: Memo<Set<PitchedEdge>>? = nil,
+        _ groupScheme: [PitchedEdge: Set<PitchedEdge>] = [:]
+    ) -> [PitchedEdge: Double] {
+            let clumpScheme = dependencies
+                .getStronglyConnectedComponents()
+                .merging(groupScheme) { return $0.union($1) }
+            let clumpedGraph = dependencies.clumpify(using: clumpScheme)
+            let groupedWeights: [Set<PitchedEdge>: Double] = generateWeights(from: clumpedGraph)
             return groupedWeights.reduce(into: [PitchedEdge: Double]()) { runningWeights, pair in
                 pair.key.forEach { pitchedEdge in
                     runningWeights[pitchedEdge] = pair.value
@@ -134,29 +131,43 @@ extension InvertingSpellingNetwork {
             }
     }
 
-    func generateWeights<Node> (from dependencies: DiGraph<Node>) -> [Node: Double] {
-        func dependeciesReducer (
+    func generateWeights<Node> (
+        from dependencies: DiGraph<Node>,
+        _ preset: Memo<Node>? = nil
+    ) -> [Node: Double] {
+        func dependenciesReducer (
             _ weights: inout [Node: Double],
             _ dependency: (key: Node, value: [Node])
             )
         {
-            func recursiveReducer (
+            func getWeight (
                 _ weights: inout [Node: Double],
                 _ dependency: (key: Node, value: [Node])
                 ) -> Double
             {
-                let weight = dependency.value.reduce(1.0) { result, edge in
-                    if weights[edge] != nil { return result + weights[edge]! }
-                    return result + recursiveReducer(
-                        &weights, (key: edge, value: dependencies.adjacencies[edge]!)
-                    )
+                if let weight = weights[dependency.key] {
+                    return weight
                 }
+                let weight = preset?.weight(dependency.key) ??
+                    dependency.value.reduce(1.0) { result, edge in
+                        return result + getWeight(
+                            &weights, (key: edge, value: dependencies.adjacencies[edge]!)
+                        )
+                    }
                 weights[dependency.key] = weight
                 return weight
             }
-            let _ = recursiveReducer(&weights, dependency)
+            let _ = getWeight(&weights, dependency)
         }
-        return dependencies.adjacencies.reduce(into: [:], dependeciesReducer)
+        return dependencies.adjacencies.reduce(into: [:], dependenciesReducer)
+    }
+    
+    struct Memo<Node> {
+        let weight: (Node) -> Double?
+        
+        init(_ weight: @escaping (Node) -> Double?) {
+            self.weight = weight
+        }
     }
 
     /// - Returns: For each `Edge`, a `Set` of `Edge` values, the sum of whose weights the edge's weight
@@ -215,7 +226,7 @@ extension InvertingSpellingNetwork {
     
     func connect(via scheme: NetworkScheme<Int>) {
         let temp: NetworkScheme<Cross<Int, Tendency>>
-            = (scheme + NetworkScheme<Int> { edge in edge.a == edge.b }).pullback { cross in cross.a }
+            = (scheme + NetworkScheme<Int> { edge in edge.a == edge.b }).pullback(get(\Cross.a))
         let mask: NetworkScheme<AssignedInnerNode> = temp.pullback { node in node.index }
         network.mask(mask)
     }
@@ -342,5 +353,14 @@ extension InvertingSpellingNetwork {
                 assignment: source.assignment
             )
         )
+    }
+}
+
+extension InvertingSpellingNetwork.Memo where Node: Hashable {
+    func pullback() -> InvertingSpellingNetwork.Memo<Set<Node>> {
+        return InvertingSpellingNetwork.Memo<Set<Node>> ({
+            let representative = $0.first!
+            return self.weight(representative)
+        })
     }
 }

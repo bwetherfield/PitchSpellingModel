@@ -5,6 +5,8 @@
 //  Created by Benjamin Wetherfield on 6/4/19.
 //
 
+import DataStructures
+
 public enum FlowNode<Index>: Hashable where Index: Hashable {
     case `internal`(Index)
     case source
@@ -18,6 +20,33 @@ public func bind <S: Hashable, A: Hashable> (_ f: @escaping (S) -> A) -> (FlowNo
         case .source: return .source
         case .sink: return .sink
         }
+    }
+}
+
+public func bind <S: Hashable, A: Hashable> (_ f: @escaping (S) -> A?) -> (FlowNode<S>) -> FlowNode<A>? {
+    return { flowNodeS in
+        switch flowNodeS {
+        case .internal(let index):
+            guard let index = f(index) else { return nil }
+            return .internal(index)
+        case .source:
+            return .source
+        case .sink:
+            return .sink
+        }
+    }
+}
+
+public func bind <A: Hashable> (
+    _ f: @escaping (OrderedPair<A>) -> Bool
+) -> (OrderedPair<FlowNode<A>>) -> Bool {
+        return { edge in
+            switch (edge.a, edge.b) {
+            case let (.internal(a), .internal(b)):
+                return f(OrderedPair(a, b))
+            default:
+                return false
+            }
     }
 }
 

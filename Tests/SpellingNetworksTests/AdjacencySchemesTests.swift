@@ -6,6 +6,9 @@
 //
 
 import XCTest
+import DataStructures
+import NetworkStructures
+import Encodings
 @testable import SpellingNetworks
 
 class AdjacencySchemesTests:XCTestCase {
@@ -17,8 +20,10 @@ class AdjacencySchemesTests:XCTestCase {
     func testExternalToExternalNodes() {
         XCTAssertFalse(Connect.connectPitchClassesForSameTendencies.containsEdge(from: .source, to: .sink))
         XCTAssertFalse(Connect.connectSameTendencies.containsEdge(from: .source, to: .sink))
-        XCTAssertFalse(Connect.sameInts.containsEdge(from: .source, to: .sink))
-        XCTAssertFalse(Connect.differentInts.containsEdge(from: .source, to: .sink))
+        let sameIndices: NetworkScheme<Cross<Int, Tendency>> = Connect.sameIndices()
+        let differentIndices: NetworkScheme<Cross<Int, Tendency>> = Connect.differentIndices()
+        XCTAssertFalse(sameIndices.containsEdge(from: .source, to: .sink))
+        XCTAssertFalse(differentIndices.containsEdge(from: .source, to: .sink))
     }
     
     func testExternalToInternalNodes() {
@@ -28,10 +33,12 @@ class AdjacencySchemesTests:XCTestCase {
         XCTAssertFalse(Connect.connectPitchClassesForDifferentTendencies
             .containsEdge(from: .source, to: .internal(.init(0,.down)))
         )
-        XCTAssertFalse(Connect.sameInts
+        let sameIndices: NetworkScheme<Cross<Int, Tendency>> = Connect.sameIndices()
+        let differentIndices: NetworkScheme<Cross<Int, Tendency>> = Connect.differentIndices()
+        XCTAssertFalse(sameIndices
             .containsEdge(from: .source, to: .internal(.init(0,.down)))
         )
-        XCTAssertFalse(Connect.differentInts
+        XCTAssertFalse(differentIndices
             .containsEdge(from: .source, to: .internal(.init(0,.down)))
         )
     }

@@ -7,7 +7,7 @@
 
 import DataStructures
 
-public struct FlowNetworkScheme<InnerNode: Hashable>: NetworkSchemeProtocol, WeightedGraphSchemeProtocol {
+public struct FlowNetworkScheme<InnerNode: Hashable>: FlowNetworkSchemeProtocol {
     public typealias Node = FlowNode<InnerNode>
     public typealias Edge = OrderedPair<Node>
     
@@ -21,16 +21,5 @@ extension FlowNetworkScheme {
     
     public init(_ weight: [Edge: Double]) {
         self.weight = { weight[$0] }
-    }
-}
-
-extension FlowNetworkScheme {
-    public func pullback<BackInnerNode>(_ innerLens: @escaping (BackInnerNode) -> InnerNode)
-        -> FlowNetworkScheme<BackInnerNode> {
-            return self.pullback(bind(innerLens))
-    }
-    
-    public func weight(from start: FlowNode<InnerNode>, to end: FlowNode<InnerNode>) -> Double? {
-        return weight(Edge(start, end))
     }
 }

@@ -8,7 +8,18 @@
 public protocol FlowNetworkSchemeProtocol: NetworkSchemeProtocol, WeightedGraphSchemeProtocol { }
 
 extension FlowNetworkSchemeProtocol {
-    public func pullback<H>(_ f: @escaping (H.InnerNode) -> InnerNode) -> H where H: FlowNetworkSchemeProtocol, H.Weight == Weight {
+    
+    @inlinable
+    public func pullback<H>(_ f: @escaping (H.InnerNode) -> InnerNode) -> H where H: FlowNetworkSchemeProtocol,
+        H.Weight == Weight
+    {
+        return pullback(bind(f))
+    }
+    
+    @inlinable
+    public func pullback<H>(_ f: @escaping (H.InnerNode) -> InnerNode?) -> H where H: FlowNetworkSchemeProtocol,
+        H.Weight == Weight
+    {
         return pullback(bind(f))
     }
 }

@@ -8,7 +8,18 @@
 public protocol UnweightedNetworkSchemeProtocol: NetworkSchemeProtocol, UnweightedGraphSchemeProtocol { }
 
 extension UnweightedNetworkSchemeProtocol {
-    public func pullback<H>(_ f: @escaping (H.InnerNode) -> InnerNode) -> H where H: UnweightedNetworkSchemeProtocol {
+    
+    @inlinable
+    public func pullback<H>(_ f: @escaping (H.InnerNode) -> InnerNode) -> H where
+        H: UnweightedNetworkSchemeProtocol
+    {
+        return pullback(bind(f))
+    }
+    
+    @inlinable
+    public func pullback<H>(_ f: @escaping (H.InnerNode) -> InnerNode?) -> H where
+        H: UnweightedNetworkSchemeProtocol
+    {
         return pullback(bind(f))
     }
 }

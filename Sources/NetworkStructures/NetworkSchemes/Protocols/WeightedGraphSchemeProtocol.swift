@@ -13,17 +13,36 @@ public protocol WeightedGraphSchemeProtocol: GraphSchemeProtocol {
     var weight: (Edge) -> Weight? { get }
     
     init (_ weight: @escaping (Edge) -> Weight?)
-    
-    func weight (from start: Node, to end: Node) -> Weight?
 }
 
 extension WeightedGraphSchemeProtocol {
+    
     @inlinable
     public func pullback <H> (_ f: @escaping (H.Node) -> Node) -> H where
         H: WeightedGraphSchemeProtocol,
         H.Weight == Weight
     {
         return H { self.weight(from: f($0.a), to: f($0.b)) }
+    }
+
+    @inlinable
+    public func pullback <H> (_ f: @escaping (H.Node) -> Node?) -> H where
+        H: WeightedGraphSchemeProtocol,
+        H.Weight == Weight
+    {
+        return H {
+            guard let a = f($0.a), let b = f($0.b) else { return nil }
+            return self.weight(from: a, to: b)
+        }
+    }
+    
+    @inlinable
+    public func weight (from start: Node, to end: Node) -> Weight? {
+        return weight(Edge(start, end))
+    }
+    
+    public var contains: (Edge) -> Bool {
+        return { self.weight($0) != nil ? true : false }
     }
 }
 

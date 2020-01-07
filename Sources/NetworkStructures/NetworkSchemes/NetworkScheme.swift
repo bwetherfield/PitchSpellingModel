@@ -20,9 +20,3 @@ extension NetworkScheme {
         self.contains = contains
     }
 }
-
-extension NetworkScheme {
-    public func containsEdge(from start: FlowNode<InnerNode>, to end: FlowNode<InnerNode>) -> Bool {
-        return contains(Edge(start, end))
-    }
-}
