@@ -14,7 +14,7 @@ script:
   - if [ $TRAVIS_OS_NAME = 'osx' ]; then
       swift package generate-xcodeproj;
       xcodebuild -quiet -project PitchSpellingModel.xcodeproj -scheme PitchSpellingModel-Package -enableCodeCoverage YES build test;
-      bash <(curl -s https://codecov.io/bash) -f "./SpellingNetworks.framework.coverage.txt";
+      bash <(curl -s https://codecov.io/bash) -J '^SpellingNetworks$';
     else
       swift test;
     fi
