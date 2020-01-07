@@ -94,11 +94,11 @@ class PitchSpellingNetwork {
         self.pitch = pitch
     }
     
-    convenience init(pitches: [[Pitch]], weightScheme: FlowNetworkScheme<Cross<Pitch.Class, Tendency>>) {
+    convenience init(pitches: [[Pitch]], weightScheme: FlowNetworkScheme<Cross<Pitch.Class, Tendency>>, phantomPitches: [Int: Pitch] = [:]) {
         let flattenedPitches: [Pitch] = pitches.reduce(into: []) { flattened, list in
             list.forEach { flattened.append($0) }
         }
-        self.init(pitches: flattenedPitches, weightScheme: weightScheme)
+        self.init(pitches: flattenedPitches, weightScheme: weightScheme, phantomPitches: phantomPitches)
         var runningCount = 0
         var indexing: [Int: Int] = [:]
         for (index, container) in pitches.enumerated() {
@@ -110,12 +110,12 @@ class PitchSpellingNetwork {
         self.partition(via: indexing)
     }
     
-    convenience init(pitches: [Pitch], weightScheme: FlowNetworkScheme<Cross<Pitch.Class, Tendency>>) {
+    convenience init(pitches: [Pitch], weightScheme: FlowNetworkScheme<Cross<Pitch.Class, Tendency>>, phantomPitches: [Int: Pitch] = [:]) {
         let indexed: [Int: Pitch] = pitches.enumerated().reduce(into: [:]) { indexedPitches, indexedPitch in
             let (index, pitch) = indexedPitch
             indexedPitches[index] = pitch
         }
-        self.init(pitches: indexed, weightScheme: weightScheme)
+        self.init(pitches: indexed, weightScheme: weightScheme, phantomPitches: phantomPitches)
     }
 }
 

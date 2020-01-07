@@ -1076,11 +1076,10 @@ class InvertingSpellingNetworkTests: XCTestCase {
                 PitchedEdge(.internal(.init(9, .up)), .sink),
             ]
         ])
-        let pitchSpellingNetwork = factory.build(from: [6,10,1,0])
+        let pitchSpellingNetwork = factory.build(from: [6,10,1], withPhantomPitches: [0:0])
         let spellings = pitchSpellingNetwork.spell(preferring: .flats)
         XCTAssertEqual(spellings[0]!.spelling, .gFlat)
         XCTAssertEqual(spellings[1]!.spelling, .bFlat)
         XCTAssertEqual(spellings[2]!.spelling, .dFlat)
-        XCTAssertEqual(spellings[3]!.spelling, .c)
     }
 }

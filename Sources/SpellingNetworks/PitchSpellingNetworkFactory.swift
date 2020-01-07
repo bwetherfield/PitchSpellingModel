@@ -18,15 +18,15 @@ class PitchSpellingNetworkFactory {
         self.weightScheme = weightScheme
     }
     
-    func build (from pitches: [Int: Pitch]) -> PitchSpellingNetwork {
-        return PitchSpellingNetwork(pitches: pitches, weightScheme: weightScheme)
+    func build (from pitches: [Int: Pitch], withPhantomPitches phantomPitches: [Int: Pitch] = [:]) -> PitchSpellingNetwork {
+        return PitchSpellingNetwork(pitches: pitches, weightScheme: weightScheme, phantomPitches: phantomPitches)
     }
     
-    func build (from pitches: [[Pitch]]) -> PitchSpellingNetwork {
-        return PitchSpellingNetwork(pitches: pitches, weightScheme: weightScheme)
+    func build (from pitches: [[Pitch]], withPhantomPitches phantomPitches: [Int: Pitch] = [:]) -> PitchSpellingNetwork {
+        return PitchSpellingNetwork(pitches: pitches, weightScheme: weightScheme, phantomPitches: phantomPitches)
     }
     
-    func build (from pitches: [Pitch]) -> PitchSpellingNetwork {
-        return PitchSpellingNetwork(pitches: pitches, weightScheme: weightScheme)
+    func build (from pitches: [Pitch], withPhantomPitches phantomPitches: [Int: Pitch] = [:]) -> PitchSpellingNetwork {
+        return PitchSpellingNetwork(pitches: pitches, weightScheme: weightScheme, phantomPitches: phantomPitches)
     }
 }
