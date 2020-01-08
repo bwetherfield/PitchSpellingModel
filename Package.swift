@@ -18,7 +18,7 @@ let package = Package(
             targets: ["SpellingNetworks"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/dn-m/Structure", .branch("pitchspeller-dependency")),
+        .package(url: "https://github.com/dn-m/Structure", from: "0.25.0"),
         .package(url: "https://github.com/dn-m/Music", from: "0.15.0"),
         .package(url: "https://github.com/dn-m/NotationModel", from: "0.8.0")
     ],
