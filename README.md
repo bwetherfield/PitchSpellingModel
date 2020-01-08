@@ -48,7 +48,7 @@ sets: [
         )
 ```
 
-Third, generate a `PitchSpellingNetwork` from the factory. `withPhantomPitches` feeds in pitches that will not be adjusted by the user, but will affect the spelling. The phantom pitches will always take their default spelling - hence `[0,4]` is acting as `[Pitch.Spelling(.c), Pitch.Spelling(.e)]`
+Third, generate a `PitchSpellingNetwork` from the factory. `withPhantomPitches` feeds in pitches that cannot be adjusted by the user, but will affect the spelling. The phantom pitches will always take their default spelling - hence `[0,4]` is acting as `[Pitch.Spelling(.c), Pitch.Spelling(.e)]`
 ```swift
 let pitchSpellingNetwork = factory.build(from: [6,10,1], withPhantomPitches: [0,4])
 ```
