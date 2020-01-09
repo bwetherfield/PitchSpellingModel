@@ -22,7 +22,7 @@
 
 First, make an `InvertingSpellingNetwork` (inputs can be `spellings: [Pitch]`, `spellings: [Int: Pitch]` or `spellings:[[Pitch]]`, where the last definition splits spellings easily into groups.
 ```swift
-InvertingSpellingNetwork(spellings: [
+let invertingSpellingNetwork = InvertingSpellingNetwork(spellings: [
             1: Pitch.Spelling(.f,.sharp),
             2: Pitch.Spelling(.a,.sharp),
             
