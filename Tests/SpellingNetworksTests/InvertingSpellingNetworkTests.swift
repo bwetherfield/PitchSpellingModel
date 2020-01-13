@@ -1353,4 +1353,586 @@ class InvertingSpellingNetworkTests: XCTestCase {
         XCTAssertEqual(sharpSpellings[1]!.spelling, .aSharp)
         XCTAssertEqual(sharpSpellings[2]!.spelling, .cSharp)
     }
+    
+    func testInverseCounterExampleTwoPhantomsFullDyads () {
+        let semitones: [[Pitch.Spelling]] = [
+            [
+            .c,
+            Pitch.Spelling(.d, .flat),
+            ],
+            [
+            Pitch.Spelling(.c, .sharp),
+            .d,
+            ],
+            [
+            .d,
+            Pitch.Spelling(.e, .flat),
+            ],
+            [
+            Pitch.Spelling(.d, .sharp),
+            .e,
+            ],
+            [
+            .e,
+            .f,
+            ],
+            [
+            .f,
+            Pitch.Spelling(.g, .flat),
+            ],
+            [
+            Pitch.Spelling(.f, .sharp),
+            .g,
+            ],
+            [
+            .g,
+            Pitch.Spelling(.a, .flat),
+            ],
+            [
+            Pitch.Spelling(.g, .sharp),
+            .a,
+            ],
+            [
+            .a,
+            Pitch.Spelling(.b, .flat),
+            ],
+            [
+            Pitch.Spelling(.a, .sharp),
+            .b,
+            ],
+            [
+            .b,
+            .c
+                ]
+        ]
+        let tones: [[Pitch.Spelling]] = [
+            [
+            .c,
+            .d,
+            ],
+            [
+            Pitch.Spelling(.d, .flat),
+            Pitch.Spelling(.e, .flat),
+            ],[
+            .cSharp,
+            .dSharp,
+            ],[
+            .d,
+            .e,
+            ],[
+            Pitch.Spelling(.e, .flat),
+            .f,
+            ],[
+            .e,
+            Pitch.Spelling(.f, .sharp),
+            ],[
+            .f,
+            .g,
+            ],[
+            Pitch.Spelling(.g, .flat),
+            Pitch.Spelling(.a, .flat),
+            ],[
+            .fSharp,
+            .gSharp,
+            ],[
+            .g,
+            .a,
+            ],[
+            .gSharp,
+            .aSharp,
+            ],[
+            Pitch.Spelling(.a, .flat),
+            Pitch.Spelling(.b, .flat),
+            ],[
+            .a,
+            .b,
+            ],[
+            Pitch.Spelling(.b, .flat),
+            .c,
+            ],[
+            .b,
+            Pitch.Spelling(.c, .sharp)
+            ]
+        ]
+        let minorThirds: [[Pitch.Spelling]] = [
+            [
+            .c,
+            Pitch.Spelling(.e, .flat),
+            ],[
+            Pitch.Spelling(.c, .sharp),
+            .e,
+            ],[
+            .d,
+            .f,
+            ],[
+            .dSharp,
+            .fSharp,
+            ],[
+            Pitch.Spelling(.e, .flat),
+            Pitch.Spelling(.g, .flat),
+            ],[
+            .e,
+            .g,
+            ],[
+            .f,
+            Pitch.Spelling(.a, .flat),
+            ],[
+            Pitch.Spelling(.f, .sharp),
+            .a,
+            ],[
+            .g,
+            Pitch.Spelling(.b, .flat),
+            ],[
+            Pitch.Spelling(.g, .sharp),
+            .b,
+            ],[
+            .a,
+            .c,
+            ],[
+            Pitch.Spelling(.b, .flat),
+            Pitch.Spelling(.d, .flat),
+            ],[
+            .aSharp,
+            .cSharp,
+            ],[
+            .b,
+            .d
+            ]
+        ]
+        let majorThirds: [[Pitch.Spelling]] = [
+            [
+            .c,
+            .e,
+            ],[
+            Pitch.Spelling(.d, .flat),
+            .f,
+            ],[
+            .d,
+            Pitch.Spelling(.f, .sharp),
+            ],[
+            Pitch.Spelling(.e, .flat),
+            .g,
+            ],[
+            .e,
+            Pitch.Spelling(.g, .sharp),
+            ],[
+            .f,
+            .a,
+            ],[
+            Pitch.Spelling(.g, .flat),
+            Pitch.Spelling(.b, .flat),
+            ],[
+            .fSharp,
+            .aSharp,
+            ],[
+            .g,
+            .b,
+            ],[
+            Pitch.Spelling(.a, .flat),
+            .c,
+            ],[
+            .a,
+            Pitch.Spelling(.c, .sharp),
+            ],[
+            Pitch.Spelling(.b, .flat),
+            .d,
+            ],[
+            .b,
+            Pitch.Spelling(.d, .sharp)
+                ]
+        ]
+        let perfectFourths: [[Pitch.Spelling]] = [
+            [
+            .c,
+            .f,
+            ],[
+            Pitch.Spelling(.d, .flat),
+            Pitch.Spelling(.g, .flat),
+            ],[
+            .d,
+            .g,
+            ],[
+            Pitch.Spelling(.e, .flat),
+            Pitch.Spelling(.a, .flat),
+            ],[
+            .e,
+            .a,
+            ],[
+            .f,
+            Pitch.Spelling(.b, .flat),
+            ],[
+            Pitch.Spelling(.f, .sharp),
+            .b,
+            ],[
+            .g,
+            .c,
+            ],[
+            Pitch.Spelling(.a, .flat),
+            Pitch.Spelling(.d, .flat),
+            ],[
+            .a,
+            .d,
+            ],[
+            Pitch.Spelling(.b, .flat),
+            Pitch.Spelling(.e, .flat),
+            ],[
+            .b,
+            .e
+                ]
+        ]
+        let dyads = semitones + tones + minorThirds + majorThirds + perfectFourths
+        let invertingSpellingNetwork = InvertingSpellingNetwork(spellings: [
+            [
+            .gFlat,
+            .bFlat,
+            .dFlat,
+            ],
+            [
+            .fSharp,
+            .aSharp,
+            .cSharp,
+            ],
+        ]
+            + dyads
+        )
+        let factory = invertingSpellingNetwork.pitchSpellingNetworkFactory(
+//            sets: [
+//            [
+//                PitchedEdge(.source, .internal(.init(1, .down))),
+//                PitchedEdge(.source, .internal(.init(6, .down))),
+//                PitchedEdge(.internal(.init(3, .up)), .sink),
+//                PitchedEdge(.internal(.init(10, .up)), .sink),
+//            ],
+//            [
+//                PitchedEdge(.internal(.init(1, .up)), .sink),
+//                PitchedEdge(.internal(.init(6, .up)), .sink),
+//                PitchedEdge(.source, .internal(.init(3, .down))),
+//                PitchedEdge(.source, .internal(.init(10, .down))),
+//            ],
+//            [
+//                PitchedEdge(.source, .internal(.init(4, .down))),
+//                PitchedEdge(.source, .internal(.init(11, .down))),
+//                PitchedEdge(.internal(.init(0, .up)), .sink),
+//                PitchedEdge(.internal(.init(5, .up)), .sink),
+//            ],
+//            [
+//                PitchedEdge(.internal(.init(4, .up)), .sink),
+//                PitchedEdge(.internal(.init(11, .up)), .sink),
+//                PitchedEdge(.source, .internal(.init(0, .down))),
+//                PitchedEdge(.source, .internal(.init(5, .down))),
+//            ],
+//            [
+//                PitchedEdge(.source, .internal(.init(2, .down))),
+//                PitchedEdge(.internal(.init(2, .up)), .sink),
+//                PitchedEdge(.source, .internal(.init(7, .down))),
+//                PitchedEdge(.internal(.init(7, .up)), .sink),
+//                PitchedEdge(.source, .internal(.init(9, .down))),
+//                PitchedEdge(.internal(.init(9, .up)), .sink),
+//            ]
+//        ]
+        )
+        let pitchSpellingNetwork = factory.build(from: [6,10,1], withPhantomPitches: [0, 4])
+        let pitchSpellingNetwork2 = factory.build(from: [6,10,1], withPhantomPitches: [0, 4])
+        let flatSpellings = pitchSpellingNetwork.spell(preferring: .flats)
+        let sharpSpellings = pitchSpellingNetwork2.spell(preferring: .sharps)
+        XCTAssertEqual(flatSpellings[0]!.spelling, .gFlat)
+        XCTAssertEqual(flatSpellings[1]!.spelling, .bFlat)
+        XCTAssertEqual(flatSpellings[2]!.spelling, .dFlat)
+        XCTAssertEqual(sharpSpellings[0]!.spelling, .fSharp)
+        XCTAssertEqual(sharpSpellings[1]!.spelling, .aSharp)
+        XCTAssertEqual(sharpSpellings[2]!.spelling, .cSharp)
+    }
+
+    func testInverseCounterExampleTwoPhantomsFullDyads3610 () {
+        let semitones: [[Pitch.Spelling]] = [
+            [
+            .c,
+            Pitch.Spelling(.d, .flat),
+            ],
+            [
+            Pitch.Spelling(.c, .sharp),
+            .d,
+            ],
+            [
+            .d,
+            Pitch.Spelling(.e, .flat),
+            ],
+            [
+            Pitch.Spelling(.d, .sharp),
+            .e,
+            ],
+            [
+            .e,
+            .f,
+            ],
+            [
+            .f,
+            Pitch.Spelling(.g, .flat),
+            ],
+            [
+            Pitch.Spelling(.f, .sharp),
+            .g,
+            ],
+            [
+            .g,
+            Pitch.Spelling(.a, .flat),
+            ],
+            [
+            Pitch.Spelling(.g, .sharp),
+            .a,
+            ],
+            [
+            .a,
+            Pitch.Spelling(.b, .flat),
+            ],
+            [
+            Pitch.Spelling(.a, .sharp),
+            .b,
+            ],
+            [
+            .b,
+            .c
+                ]
+        ]
+        let tones: [[Pitch.Spelling]] = [
+            [
+            .c,
+            .d,
+            ],
+            [
+            Pitch.Spelling(.d, .flat),
+            Pitch.Spelling(.e, .flat),
+            ],[
+            .cSharp,
+            .dSharp,
+            ],[
+            .d,
+            .e,
+            ],[
+            Pitch.Spelling(.e, .flat),
+            .f,
+            ],[
+            .e,
+            Pitch.Spelling(.f, .sharp),
+            ],[
+            .f,
+            .g,
+            ],[
+            Pitch.Spelling(.g, .flat),
+            Pitch.Spelling(.a, .flat),
+            ],[
+            .fSharp,
+            .gSharp,
+            ],[
+            .g,
+            .a,
+            ],[
+            .gSharp,
+            .aSharp,
+            ],[
+            Pitch.Spelling(.a, .flat),
+            Pitch.Spelling(.b, .flat),
+            ],[
+            .a,
+            .b,
+            ],[
+            Pitch.Spelling(.b, .flat),
+            .c,
+            ],[
+            .b,
+            Pitch.Spelling(.c, .sharp)
+            ]
+        ]
+        let minorThirds: [[Pitch.Spelling]] = [
+            [
+            .c,
+            Pitch.Spelling(.e, .flat),
+            ],[
+            Pitch.Spelling(.c, .sharp),
+            .e,
+            ],[
+            .d,
+            .f,
+            ],[
+            .dSharp,
+            .fSharp,
+            ],[
+            Pitch.Spelling(.e, .flat),
+            Pitch.Spelling(.g, .flat),
+            ],[
+            .e,
+            .g,
+            ],[
+            .f,
+            Pitch.Spelling(.a, .flat),
+            ],[
+            Pitch.Spelling(.f, .sharp),
+            .a,
+            ],[
+            .g,
+            Pitch.Spelling(.b, .flat),
+            ],[
+            Pitch.Spelling(.g, .sharp),
+            .b,
+            ],[
+            .a,
+            .c,
+            ],[
+            Pitch.Spelling(.b, .flat),
+            Pitch.Spelling(.d, .flat),
+            ],[
+            .aSharp,
+            .cSharp,
+            ],[
+            .b,
+            .d
+            ]
+        ]
+        let majorThirds: [[Pitch.Spelling]] = [
+            [
+            .c,
+            .e,
+            ],[
+            Pitch.Spelling(.d, .flat),
+            .f,
+            ],[
+            .d,
+            Pitch.Spelling(.f, .sharp),
+            ],[
+            Pitch.Spelling(.e, .flat),
+            .g,
+            ],[
+            .e,
+            Pitch.Spelling(.g, .sharp),
+            ],[
+            .f,
+            .a,
+            ],[
+            Pitch.Spelling(.g, .flat),
+            Pitch.Spelling(.b, .flat),
+            ],[
+            .fSharp,
+            .aSharp,
+            ],[
+            .g,
+            .b,
+            ],[
+            Pitch.Spelling(.a, .flat),
+            .c,
+            ],[
+            .a,
+            Pitch.Spelling(.c, .sharp),
+            ],[
+            Pitch.Spelling(.b, .flat),
+            .d,
+            ],[
+            .b,
+            Pitch.Spelling(.d, .sharp)
+                ]
+        ]
+        let perfectFourths: [[Pitch.Spelling]] = [
+            [
+            .c,
+            .f,
+            ],[
+            Pitch.Spelling(.d, .flat),
+            Pitch.Spelling(.g, .flat),
+            ],[
+            .d,
+            .g,
+            ],[
+            Pitch.Spelling(.e, .flat),
+            Pitch.Spelling(.a, .flat),
+            ],[
+            .e,
+            .a,
+            ],[
+            .f,
+            Pitch.Spelling(.b, .flat),
+            ],[
+            Pitch.Spelling(.f, .sharp),
+            .b,
+            ],[
+            .g,
+            .c,
+            ],[
+            Pitch.Spelling(.a, .flat),
+            Pitch.Spelling(.d, .flat),
+            ],[
+            .a,
+            .d,
+            ],[
+            Pitch.Spelling(.b, .flat),
+            Pitch.Spelling(.e, .flat),
+            ],[
+            .b,
+            .e
+                ]
+        ]
+        let dyads = semitones + tones + minorThirds + majorThirds + perfectFourths
+        let invertingSpellingNetwork = InvertingSpellingNetwork(spellings: [
+            [
+            .gFlat,
+            .bFlat,
+            .dFlat,
+            .eFlat
+            ],
+            [
+            .fSharp,
+            .aSharp,
+            .cSharp,
+            .dSharp
+            ],
+        ]
+//            + dyads
+        )
+        let factory = invertingSpellingNetwork.pitchSpellingNetworkFactory(
+            sets: [
+            [
+                PitchedEdge(.source, .internal(.init(1, .down))),
+                PitchedEdge(.source, .internal(.init(6, .down))),
+                PitchedEdge(.internal(.init(3, .up)), .sink),
+                PitchedEdge(.internal(.init(10, .up)), .sink),
+            ],
+            [
+                PitchedEdge(.internal(.init(1, .up)), .sink),
+                PitchedEdge(.internal(.init(6, .up)), .sink),
+                PitchedEdge(.source, .internal(.init(3, .down))),
+                PitchedEdge(.source, .internal(.init(10, .down))),
+            ],
+            [
+                PitchedEdge(.source, .internal(.init(4, .down))),
+                PitchedEdge(.source, .internal(.init(11, .down))),
+                PitchedEdge(.internal(.init(0, .up)), .sink),
+                PitchedEdge(.internal(.init(5, .up)), .sink),
+            ],
+            [
+                PitchedEdge(.internal(.init(4, .up)), .sink),
+                PitchedEdge(.internal(.init(11, .up)), .sink),
+                PitchedEdge(.source, .internal(.init(0, .down))),
+                PitchedEdge(.source, .internal(.init(5, .down))),
+            ],
+            [
+                PitchedEdge(.source, .internal(.init(2, .down))),
+                PitchedEdge(.internal(.init(2, .up)), .sink),
+                PitchedEdge(.source, .internal(.init(7, .down))),
+                PitchedEdge(.internal(.init(7, .up)), .sink),
+                PitchedEdge(.source, .internal(.init(9, .down))),
+                PitchedEdge(.internal(.init(9, .up)), .sink),
+            ]
+        ]
+        )
+        let pitchSpellingNetwork = factory.build(from: [3,6,10,1], withPhantomPitches: [0,4])
+        let pitchSpellingNetwork2 = factory.build(from: [3,6,10,1], withPhantomPitches: [0,4])
+        let flatSpellings = pitchSpellingNetwork.spell(preferring: .flats)
+        let sharpSpellings = pitchSpellingNetwork2.spell(preferring: .sharps)
+        XCTAssertEqual(flatSpellings[0]!.spelling, .eFlat)
+        XCTAssertEqual(flatSpellings[1]!.spelling, .gFlat)
+        XCTAssertEqual(flatSpellings[2]!.spelling, .bFlat)
+        XCTAssertEqual(flatSpellings[3]!.spelling, .dFlat)
+        XCTAssertEqual(sharpSpellings[0]!.spelling, .dSharp)
+        XCTAssertEqual(sharpSpellings[1]!.spelling, .fSharp)
+        XCTAssertEqual(sharpSpellings[2]!.spelling, .aSharp)
+        XCTAssertEqual(sharpSpellings[3]!.spelling, .cSharp)
+    }
 }
