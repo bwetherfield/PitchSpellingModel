@@ -7,12 +7,14 @@
 
 import DataStructures
 
+// `FlowNetworkProtocol` `Node` monad wrapper
 public enum FlowNode<Index>: Hashable where Index: Hashable {
     case `internal`(Index)
     case source
     case sink
 }
 
+/// - Returns: function over `FlowNode` types that derives `internal` return value from `f`
 public func bind <S: Hashable, A: Hashable> (_ f: @escaping (S) -> A) -> (FlowNode<S>) -> FlowNode<A> {
     return { flowNodeS in
         switch flowNodeS {
@@ -23,6 +25,7 @@ public func bind <S: Hashable, A: Hashable> (_ f: @escaping (S) -> A) -> (FlowNo
     }
 }
 
+/// - Returns: function over `FlowNode` types that derives `internal` return value from `f`, with optional return values.
 public func bind <S: Hashable, A: Hashable> (_ f: @escaping (S) -> A?) -> (FlowNode<S>) -> FlowNode<A>? {
     return { flowNodeS in
         switch flowNodeS {
@@ -37,6 +40,7 @@ public func bind <S: Hashable, A: Hashable> (_ f: @escaping (S) -> A?) -> (FlowN
     }
 }
 
+/// - Returns: predicate on `Edge` type lifted to `FlowNode` layer
 public func bind <A: Hashable> (
     _ f: @escaping (OrderedPair<A>) -> Bool
 ) -> (OrderedPair<FlowNode<A>>) -> Bool {
@@ -51,6 +55,9 @@ public func bind <A: Hashable> (
 }
 
 extension FlowNode: Codable where Index: Codable {
+    
+    // MARK: - Codable
+    
     private enum CodingKeys: String, CodingKey {
         case external
         case `internal`

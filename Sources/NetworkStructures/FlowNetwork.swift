@@ -9,13 +9,19 @@ import DataStructures
 
 public struct FlowNetwork<InnerNode: Hashable> {
     
+    // MARK: - Associated Types
+    
     public typealias Node = FlowNode<InnerNode>
+    
+    // MARK: - Instance Properties
 
     public var weights: [Node: [Node: Double]] = [.source: [:], .sink: [:]]
     public var reverseAdjacencies: [Node: Set<Node>] = [.source: [], .sink: []]
 }
 
 extension FlowNetwork {
+    
+    // MARK: - Initializers
     
     public init (nodes: [InnerNode], scheme: FlowNetworkScheme<InnerNode>) {
         self.init()
@@ -52,14 +58,17 @@ extension FlowNetwork {
         }
     }
     
+    /// Inserts edge between internal nodes
     mutating func edge(from start: InnerNode, to end: InnerNode, withWeight weight: Double) {
         insertEdge(from: .internal(start), to: .internal(end), withWeight: weight)
     }
     
+    /// Inserts edge from source
     mutating func sourceEdge(to end: InnerNode, withWeight weight: Double) {
         insertEdge(from: .source, to: .internal(end), withWeight: weight)
     }
     
+    /// Inserts edge to sink
     mutating func sinkEdge(from start: InnerNode, withWeight weight: Double) {
         insertEdge(from: .internal(start), to: .sink, withWeight: weight)
     }
@@ -76,6 +85,7 @@ extension FlowNetwork {
         reverseAdjacencies[end]!.remove(start)
     }
     
+    /// Keeps and removes edges according to the presence of edges in `scheme`
     public mutating func mask (_ scheme: NetworkScheme<InnerNode>) {
         weights.forEach { (node, neighbors) in
             neighbors.keys.forEach { neighbor in
@@ -84,6 +94,8 @@ extension FlowNetwork {
         }
     }
     
+    /// Multiplies weights or removes edges according to the optional weight value
+    /// dictated by `weightScheme`
     public mutating func mask (_ weightScheme: FlowNetworkScheme<InnerNode>) {
         weights.forEach { (node, neighbors) in
             neighbors.keys.forEach { neighbor in
@@ -136,6 +148,8 @@ extension FlowNetwork {
 }
 
 extension FlowNetwork {
+    
+    /// - Returns: unweighted version of `self`
     var unweighted: UnweightedNetwork<InnerNode> {
         return UnweightedNetwork(
             adjacencies: weights.reduce(into: [Node: Set<Node>]()) { adjacencies, forNode in
@@ -208,10 +222,12 @@ extension FlowNetwork {
 
 extension Sequence {
     
+    /// - Returns: original sequence with `predicate`-satisfying elements removed.
     func filterComplement (_ predicate: (Element) -> Bool) -> [Element] {
         return filter { !predicate($0) }
     }
     
+    /// - Returns: tuple of sequences, split according to the elements that do not satisfy `predicate` and those that do.
     func partition (_ predicate: (Element) -> Bool) -> (whereFalse: [Element], whereTrue: [Element]) {
         return (filterComplement(predicate), filter(predicate))
     }

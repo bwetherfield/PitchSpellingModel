@@ -8,6 +8,9 @@
 import DataStructures
 
 public protocol WeightedGraphSchemeProtocol: GraphSchemeProtocol {
+    
+    // MARK: - Associated Types
+    
     associatedtype Weight: Numeric
     
     var weight: (Edge) -> Weight? { get }
@@ -17,6 +20,8 @@ public protocol WeightedGraphSchemeProtocol: GraphSchemeProtocol {
 
 extension WeightedGraphSchemeProtocol {
     
+    /// - Returns:`FlowNetworkSchemeProtocol`constructed  by deriving weights from `self`
+    /// using `f` map over `Node` types.
     @inlinable
     public func pullback <H> (_ f: @escaping (H.Node) -> Node) -> H where
         H: WeightedGraphSchemeProtocol,
@@ -25,6 +30,8 @@ extension WeightedGraphSchemeProtocol {
         return H { self.weight(from: f($0.a), to: f($0.b)) }
     }
 
+    /// - Returns: `FlowNetworkSchemeProtocol` constructed  by deriving weights from `self`
+    /// using `f` map over `Node` types optional return values.
     @inlinable
     public func pullback <H> (_ f: @escaping (H.Node) -> Node?) -> H where
         H: WeightedGraphSchemeProtocol,
@@ -48,6 +55,7 @@ extension WeightedGraphSchemeProtocol {
 
 extension WeightedGraphSchemeProtocol {
 
+    /// - Returns: `Self` type summing edges present in `lhs` and `rhs`
     public static func + (lhs: Self, rhs: Self) -> Self {
         return Self { edge in
             guard let left = lhs.weight(edge) else {
@@ -60,6 +68,7 @@ extension WeightedGraphSchemeProtocol {
         }
     }
 
+    /// - Returns: `Self` type multiplying edges present in `lhs` and `rhs`using `Optional` monad
     public static func * (lhs: Self, rhs: Self) -> Self {
         return Self { edge in
             if let left = lhs.weight(edge), let right = rhs.weight(edge) {
@@ -70,6 +79,7 @@ extension WeightedGraphSchemeProtocol {
         }
     }
     
+    /// - Returns: `UnweightedGraphSchemeProtocol` with edges retained if they are presen tin `rhs`
     public static func *<H> (lhs: Self, rhs: H) -> Self
         where H: UnweightedGraphSchemeProtocol, H.Edge == Edge {
         return Self { edge in

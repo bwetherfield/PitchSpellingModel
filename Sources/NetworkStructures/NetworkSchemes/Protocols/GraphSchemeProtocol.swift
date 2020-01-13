@@ -8,6 +8,9 @@
 import DataStructures
 
 public protocol GraphSchemeProtocol {
+    
+    // MARK: - Assoiated Types
+    
     associatedtype Node
     associatedtype Edge: SymmetricPair where Edge.A == Node
     

@@ -10,7 +10,7 @@ public struct DiGraph<Node: Hashable> {
     
     // MARK: - Instance Properties
     
-    // Stores the set of nodes adjacent to each node
+    /// Stores the set of nodes adjacent to each node
     public let adjacencies: [Node: [Node]]
     
     // MARK: - Initializers
@@ -19,8 +19,8 @@ public struct DiGraph<Node: Hashable> {
         self.adjacencies = adjacencies
     }
     
-    // Safe initializer that ensures there are no hanging nodes inside of a "value" `Set` that are not within
-    // the "keys" of `adjancencies`.
+    /// Safe initializer that ensures there are no hanging nodes inside of a "value" `Set` that are not within
+    /// the "keys" of `adjancencies`.
     public init(safe adjacencies: [Node: [Node]]) {
         self.adjacencies = adjacencies.reduce(into: [Node: [Node]]()) { completed, pair in
             let (node, neighbors) = pair
@@ -36,7 +36,7 @@ extension DiGraph {
     
     // MARK: - Instance Methods
     
-    // Tarjan's algorithm to find strongly connected components
+    /// Tarjan's algorithm to find strongly connected components
     public func getStronglyConnectedComponents () -> [Node: Set<Node>] {
             
             func reducer(
@@ -95,8 +95,8 @@ extension DiGraph {
             return adjacencies.reduce(into: [:], reducer)
     }
     
-    // Group nodes according to the set-forming function `nodeClumper` and return the resulting
-    // `AdjacencyList`, removing self-loops that arise.
+    /// Group nodes according to the set-forming function `nodeClumper` and return the resulting
+    /// `AdjacencyList`, removing self-loops that arise.
     public func clumpify (using nodeClumper: [Node: Set<Node>]) -> DiGraph<Set<Node>> {
         return DiGraph<Set<Node>>(
             adjacencies.reduce(into: [Set<Node>: [Set<Node>]]()) { list, adjacencyPair in
@@ -115,14 +115,14 @@ extension DiGraph {
         })
     }
     
-    // Group nodes according to the function that sends a node to its strongly connected component, as found
-    // by the implementation of Tarjan's algorithm, hence forming a Directed Acyclic Graph (DAG) version of
-    // original `DirectedGraph` (`self`).
+    /// Group nodes according to the function that sends a node to its strongly connected component, as found
+    /// by the implementation of Tarjan's algorithm, hence forming a Directed Acyclic Graph (DAG) version of
+    /// original `DirectedGraph` (`self`).
     public func DAGify () -> DiGraph<Set<Node>> {
         return clumpify (using: getStronglyConnectedComponents())
     }
     
-    // Determines whether the directed graph contains a cycle.
+    /// Determines whether the directed graph contains a cycle.
     public func containsCycle () -> Bool {
         
         var flag = false
