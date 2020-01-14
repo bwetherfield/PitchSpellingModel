@@ -11,6 +11,7 @@ import Encodings
 import Pitch
 import SpelledPitch
 
+/// Wraps flow network for deriving minimum cut and spelling pitches based on encoding system.
 class PitchSpellingNetwork {
     
     // MARK: - Associated Types

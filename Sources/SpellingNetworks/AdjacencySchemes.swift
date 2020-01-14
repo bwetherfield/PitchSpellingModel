@@ -10,6 +10,7 @@ import Encodings
 import DataStructures
 import Pitch
 
+// TODO: Move typealiases
 typealias AssignedEdge = OrderedPair<AssignedNode>
 typealias UnassignedEdge = OrderedPair<UnassignedNode>
 public typealias PitchedNode = FlowNode<Cross<Pitch.Class, Tendency>>

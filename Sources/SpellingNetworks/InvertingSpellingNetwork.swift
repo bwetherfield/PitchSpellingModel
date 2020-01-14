@@ -11,7 +11,21 @@ import DataStructures
 import Pitch
 import SpelledPitch
 
+/// Wraps unweighted network for generating weight parameters for `PitchSpellingNetwork` types.
 class InvertingSpellingNetwork {
+    
+    // MARK: - Associated Types
+    
+    // Wrapper for weight function, supporting optional chaining.
+    struct Memo<Node> {
+        let weight: (Node) -> Double?
+        
+        init(_ weight: @escaping (Node) -> Double?) {
+            self.weight = weight
+        }
+    }
+    
+    // MARK: - Instance Properties
     
     var network: UnweightedNetwork<AssignedInnerNode>
     let pitchClass: (Int) -> Pitch.Class?
@@ -161,15 +175,6 @@ extension InvertingSpellingNetwork {
             let _ = getWeight(&weights, dependency)
         }
         return dependencies.adjacencies.reduce(into: [:], dependenciesReducer)
-    }
-    
-    // Wrapper for weight function, supporting optional chaining.
-    struct Memo<Node> {
-        let weight: (Node) -> Double?
-        
-        init(_ weight: @escaping (Node) -> Double?) {
-            self.weight = weight
-        }
     }
 
     /// - Returns: For each `Edge`, a `Set` of `Edge` values, the sum of whose weights the edge's weight

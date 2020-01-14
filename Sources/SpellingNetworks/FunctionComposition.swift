@@ -5,7 +5,6 @@
 //  Created by Benjamin Wetherfield on 1/6/20.
 //
 
-
 precedencegroup FunctionCompositionPrecedence {
     associativity: right
     higherThan: AdditionPrecedence
