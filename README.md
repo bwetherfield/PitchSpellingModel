@@ -60,7 +60,7 @@ Fourth, adjust `PitchSpellingNetwork` weights using mask schemes. Using the foll
 ```
 `scheme` defines some weight scale factors based on `Edge<T>` values. These are pulled back to the `PitchSpellingNetwork`'s weight scheme via the `lens: @escaping (Int) -> T` parameter, which gives us a map from the pitch index `Int` to the index of the newly supplied `FlowNetworkScheme`. 
 
-Fifth, spell! `preferring` is an optional parameter `.sharps` by default. It determines whether the search to determine the minimum cut found by the Edmonds-Karp maximum flow algorithm is taken from the `.source` or the `.sink`.
+Fifth, spell! `preferring` is an optional parameter, `.sharps` by default. It determines whether the search to determine the minimum cut found by the Edmonds-Karp maximum flow algorithm is taken from the `.source` or the `.sink`.
 ```swift
 let spellings: [Int: SpelledPitch] = pitchSpellingNetwork.spell(preferring: .flats)
 ```
