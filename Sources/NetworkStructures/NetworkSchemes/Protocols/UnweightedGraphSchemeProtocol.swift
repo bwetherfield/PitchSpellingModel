@@ -13,6 +13,8 @@ public protocol UnweightedGraphSchemeProtocol: GraphSchemeProtocol {
 
 extension UnweightedGraphSchemeProtocol {
     
+    /// - Returns: `UnweightedGraphSchemeProtocol` type by deriving adjacencies from `self`
+    /// using `f` map over `Node` types.
     @inlinable
     public func pullback <H> (_ f: @escaping (H.Node) -> Node) -> H where
         H: UnweightedGraphSchemeProtocol
@@ -20,6 +22,8 @@ extension UnweightedGraphSchemeProtocol {
         return H { self.contains(Edge(f($0.a),f($0.b))) }
     }
     
+    /// - Returns:`UnweightedGraphSchemeProtocol`type deriving adjacencies from `self` using
+    /// using `f` map over `Node` types. with optional return values.
     @inlinable
     public func pullback <H> (_ f: @escaping (H.Node) -> Node?) -> H where
         H: UnweightedGraphSchemeProtocol

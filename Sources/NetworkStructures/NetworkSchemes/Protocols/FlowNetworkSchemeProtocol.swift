@@ -9,15 +9,21 @@ public protocol FlowNetworkSchemeProtocol: NetworkSchemeProtocol, WeightedGraphS
 
 extension FlowNetworkSchemeProtocol {
     
+    /// - Returns: `FlowNetworkSchemeProtocol` type deriving weights from `self`
+    /// using `f` map over `InnerNode` types
     @inlinable
-    public func pullback<H>(_ f: @escaping (H.InnerNode) -> InnerNode) -> H where H: FlowNetworkSchemeProtocol,
+    public func pullback<H>(_ f: @escaping (H.InnerNode) -> InnerNode) -> H where
+        H: FlowNetworkSchemeProtocol,
         H.Weight == Weight
     {
         return pullback(bind(f))
     }
     
+    /// - Returns: `FlowNetworkSchemeProtocol` type deriving weights from `self`
+    /// using `f` map over `InnerNode` types with optional return values.
     @inlinable
-    public func pullback<H>(_ f: @escaping (H.InnerNode) -> InnerNode?) -> H where H: FlowNetworkSchemeProtocol,
+    public func pullback<H>(_ f: @escaping (H.InnerNode) -> InnerNode?) -> H where
+        H: FlowNetworkSchemeProtocol,
         H.Weight == Weight
     {
         return pullback(bind(f))

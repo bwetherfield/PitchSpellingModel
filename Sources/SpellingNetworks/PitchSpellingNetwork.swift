@@ -11,12 +11,17 @@ import Encodings
 import Pitch
 import SpelledPitch
 
+/// Wraps flow network for deriving minimum cut and spelling pitches based on encoding system.
 class PitchSpellingNetwork {
     
+    // MARK: - Associated Types
+    
+    // Supplements main (user) node index with index for phantom nodes
     enum Index {
         case primary(Int)
         case phantom(Int)
         
+        // Prism for `.primary` case
         var primary: Int? {
             switch self {
             case .primary(let value):
@@ -26,6 +31,7 @@ class PitchSpellingNetwork {
             }
         }
         
+        // Prism for `.phantom` case
         var phantom: Int? {
             switch self {
             case .phantom(let value):
@@ -35,6 +41,7 @@ class PitchSpellingNetwork {
             }
         }
         
+        /// - Returns: `Cross` with `Index` mapped to `Int` if `node` is `.primary`, and `nil` if not
         static func downCast(_ node: Cross<Index,Tendency>) -> Cross<Int, Tendency>? {
             guard let int = node.a.primary else { return nil }
             return Cross(int, node.b)
@@ -63,8 +70,12 @@ class PitchSpellingNetwork {
     }
     
     init(pitches: [Int: Pitch], weightScheme: FlowNetworkScheme<Cross<Pitch.Class, Tendency>>, phantomPitches: [Int: Pitch] = [:]) {
+        
+        // Return pitch assigned to `Index` value whether primary or phantom
         let pitch: (Index) -> Pitch? =
             get(\Index.primary) >>> { pitches[$0] } ||| get(\Index.phantom) >>> { phantomPitches[$0] }
+        
+        // Add two nodes to `flowNetwork` per input pitch; likewise for phantom pitches
         let nodes: [Cross<Index, Tendency>] = pitches.keys.reduce(into: []) { list, int in
             list.append(.init(.primary(int), .down))
             list.append(.init(.primary(int), .up))
@@ -73,10 +84,14 @@ class PitchSpellingNetwork {
             list.append(.init(.phantom(int), .down))
             list.append(.init(.phantom(int), .up))
         }
+        
+        // Map node index to `Pitch.Class` equivalent
         let pitchClassMap: (Cross<Index, Tendency>) -> Cross<Pitch.Class, Tendency>? = { cross in
             guard let pitchClass = pitch(cross.a)?.class else { return nil }
             return Cross(pitchClass, cross.b)
         }
+        
+        // Pull back generic weight schemes for specific collection of pitches
         let differentIntScheme: FlowNetworkScheme<Cross<Index, Tendency>> =
              weightScheme.pullback(pitchClassMap)
                  * (
@@ -88,6 +103,8 @@ class PitchSpellingNetwork {
         let sameIndexScheme: FlowNetworkScheme<Cross<Index, Tendency>> =
             Double.infinity * (sameIndices * upToDown)
         let combinedScheme: FlowNetworkScheme<Cross<Index, Tendency>> = sameIndexScheme + differentIntScheme
+        
+        // Initialize properties
         self.flowNetwork = FlowNetwork(
             nodes: nodes + phantomPitches,
             scheme: combinedScheme)
@@ -95,10 +112,13 @@ class PitchSpellingNetwork {
     }
     
     convenience init(pitches: [[Pitch]], weightScheme: FlowNetworkScheme<Cross<Pitch.Class, Tendency>>, phantomPitches: [Int: Pitch] = [:]) {
+        // Initialize without subarry structure
         let flattenedPitches: [Pitch] = pitches.reduce(into: []) { flattened, list in
             list.forEach { flattened.append($0) }
         }
         self.init(pitches: flattenedPitches, weightScheme: weightScheme, phantomPitches: phantomPitches)
+        
+        // Apply partitioning based on subarray structure
         var runningCount = 0
         var indexing: [Int: Int] = [:]
         for (index, container) in pitches.enumerated() {
@@ -111,6 +131,7 @@ class PitchSpellingNetwork {
     }
     
     convenience init(pitches: [Pitch], weightScheme: FlowNetworkScheme<Cross<Pitch.Class, Tendency>>, phantomPitches: [Int: Pitch] = [:]) {
+        // Enumerate supplied pitches
         let indexed: [Int: Pitch] = pitches.enumerated().reduce(into: [:]) { indexedPitches, indexedPitch in
             let (index, pitch) = indexedPitch
             indexedPitches[index] = pitch
@@ -177,6 +198,7 @@ extension PitchSpellingNetwork {
             }.mapValues(spellPitch)
     }
 
+    /// - Returns: `SpelledPitch` corresponding to the `Pitch` and `Tendency` values of `up` and `down`
     private func spellPitch(
         _ up: AssignedInnerNode,
         _ down: AssignedInnerNode
@@ -191,6 +213,7 @@ extension PitchSpellingNetwork {
 
 extension PitchSpellingNetwork {
     
+    /// Connects indices that share the same associated value
     func partition (via indices: [Int: Int]) {
         let adjacencyScheme = FlowNetworkScheme<Int> { edge in
             switch (edge.a, edge.b) {
@@ -203,6 +226,7 @@ extension PitchSpellingNetwork {
         connect(via: adjacencyScheme)
     }
     
+    /// Connects `.primary` nodes based on `scheme`
     func connect(via scheme: FlowNetworkScheme<Int>) {
         let mask: FlowNetworkScheme<Cross<Index, Tendency>>
             = (scheme + FlowNetworkScheme<Int> { edge in

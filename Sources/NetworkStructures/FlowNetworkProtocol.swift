@@ -19,6 +19,7 @@ public protocol FlowNetworkProtocol where InnerNode: Hashable {
 
 extension FlowNetworkProtocol {
 
+    /// - Returns: shortest path with residual capacity left in flow network
     public func augmentingPath() -> [Node]? {
         var breadcrumbs: [Node: Node] = [:]
 
@@ -46,6 +47,7 @@ extension FlowNetworkProtocol {
         return nil
     }
     
+    /// - Returns: array of all nodes reachable from `.source`
     @inlinable
     public func sourceSearch() -> [Node] {
         var visited: [Node] = []
@@ -63,6 +65,7 @@ extension FlowNetworkProtocol {
         return visited
     }
     
+    /// - Returns: array of all nodes reachable from `.sink` with arcs reversed
     @inlinable
     public func sinkSearch() -> [Node] {
         var visited: [Node] = []

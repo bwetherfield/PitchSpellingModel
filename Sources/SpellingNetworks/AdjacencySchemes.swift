@@ -10,6 +10,7 @@ import Encodings
 import DataStructures
 import Pitch
 
+// TODO: Move typealiases
 typealias AssignedEdge = OrderedPair<AssignedNode>
 typealias UnassignedEdge = OrderedPair<UnassignedNode>
 public typealias PitchedNode = FlowNode<Cross<Pitch.Class, Tendency>>
@@ -20,7 +21,7 @@ typealias Connect = AdjacencySchemes
 struct AdjacencySchemes {
     
     /// Adjacency scheme that connects `.up` tendencies to `.down` tendencies
-    // for sameInts
+    /// for sameInts
     static func upToDown <Index: Hashable> () -> NetworkScheme<Cross<Index, Tendency>> {
         return NetworkScheme<Tendency>(bind { edge in edge.a == .up && edge.b == .down })
             .pullback(get(\Cross.b))
@@ -54,10 +55,12 @@ struct AdjacencySchemes {
         return NetworkScheme<Index> (bind { edge in edge.a != edge.b }).pullback(get(\Cross.a))
     }
     
+    /// Adjacency scheme that connects nodes with different `Tendency` values for the right `Pitch.Class` values
     static var differentTendenciesAppropriately: NetworkScheme<Cross<Pitch.Class, Tendency>> {
         return connectDifferentTendencies * connectPitchClassesForDifferentTendencies
     }
     
+    /// Adjacency scheme that connects nodes with the same `Tendency` values for the right `Pitch.Class` values
     static var sameTendenciesAppropriately: NetworkScheme<Cross<Pitch.Class, Tendency>> {
         return connectSameTendencies * connectPitchClassesForSameTendencies
     }
@@ -76,11 +79,15 @@ struct AdjacencySchemes {
             && !PitchClassesForDifferentTendenciesLookup.contains(.init(edge.a.a, edge.b.a))
         })
     
+    /// Adjacency scheme that connects nodes according to presence in lookup table
+    /// `PitchClassesForDifferentTendenciesLookup`
     static let connectPitchClassesForDifferentTendencies: NetworkScheme<Cross<Pitch.Class, Tendency>> =
         NetworkScheme (bind { edge in
             PitchClassesForDifferentTendenciesLookup.contains(.init(edge.a.a, edge.b.a))
         })
     
+    /// Adjacency scheme that connects nodes according to absence in lookup table
+    /// `PitchClassesForDifferentTendenciesLookup`
     static let connectPitchClassesForSameTendencies: NetworkScheme<Cross<Pitch.Class, Tendency>> =
         NetworkScheme (bind { edge in
             return !PitchClassesForDifferentTendenciesLookup.contains(.init(edge.a.a, edge.b.a))

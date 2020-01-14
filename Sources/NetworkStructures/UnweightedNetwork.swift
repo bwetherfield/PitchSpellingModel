@@ -6,10 +6,17 @@
 //
 
 public struct UnweightedNetwork<InnerNode: Hashable> {
+    
+    // MARK: - Associated Types
+    
     public typealias Node = FlowNode<InnerNode>
+    
+    // MARK: - Instance Properties
     
     public var adjacencies: [Node: Set<Node>] = [.source: [], .sink: []]
     private var reverseAdjacencies: [Node: Set<Node>] = [.source: [], .sink: []]
+    
+    // MARK: - Initializers
     
     public init() {}
     

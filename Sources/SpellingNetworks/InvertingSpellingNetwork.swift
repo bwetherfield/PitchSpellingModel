@@ -11,13 +11,56 @@ import DataStructures
 import Pitch
 import SpelledPitch
 
+/// Wraps unweighted network for generating weight parameters for `PitchSpellingNetwork` types.
 class InvertingSpellingNetwork {
+    
+    // MARK: - Associated Types
+    
+    // Wrapper for weight function, supporting optional chaining.
+    struct Memo<Node> {
+        let weight: (Node) -> Double?
+        
+        init(_ weight: @escaping (Node) -> Double?) {
+            self.weight = weight
+        }
+    }
+    
+    // MARK: - Instance Properties
     
     var network: UnweightedNetwork<AssignedInnerNode>
     let pitchClass: (Int) -> Pitch.Class?
 
     // MARK: - Initializers
 
+    init(spellings: [Int: Pitch.Spelling]) {
+        self.network = UnweightedNetwork(internalNodes: internalNodes(spellings: spellings))
+        self.pitchClass = { int in spellings[int]?.pitchClass }
+
+        // Pull back generic adjacency schemes for specific collection of pitches
+        let specificEdgeScheme: NetworkScheme<UnassignedInnerNode> =
+            (Connect.sameTendenciesAppropriately +
+                Connect.differentTendenciesAppropriately).pullback(nodeMapper)
+            * Connect.differentIndices()
+        let sameIntEdgesScheme: NetworkScheme<UnassignedInnerNode> =
+            Connect.upToDown() * Connect.sameIndices()
+        let specificSourceScheme: NetworkScheme<UnassignedInnerNode> =
+            Connect.sourceToDown.pullback(nodeMapper)
+        let specificSinkScheme: NetworkScheme<UnassignedInnerNode> =
+            Connect.upToSink.pullback(nodeMapper)
+        let allSchemes: [NetworkScheme<UnassignedInnerNode>] = [
+            specificEdgeScheme,
+            sameIntEdgesScheme,
+            specificSourceScheme,
+            specificSinkScheme
+        ]
+
+        // Apply masking by adjacency schemes, pulled back to include node assignments
+        let maskScheme: NetworkScheme<AssignedInnerNode> = allSchemes
+            .reduce(NetworkScheme { _ in false }, +)
+            .pullback({ $0.unassigned })
+        self.network.mask(maskScheme)
+    }
+    
     convenience init(spellings: [[Pitch.Spelling]]) {
         let flattenedSpellings: [Pitch.Spelling] = spellings.reduce(into: []) { flattened, list in
             list.forEach { flattened.append($0) }
@@ -40,39 +83,6 @@ class InvertingSpellingNetwork {
             indexedSpellings[index] = spelling
         }
         self.init(spellings: indexed)
-    }
-
-    init(spellings: [Int: Pitch.Spelling]) {
-        self.network = UnweightedNetwork(internalNodes: internalNodes(spellings: spellings))
-        self.pitchClass = { int in spellings[int]?.pitchClass }
-
-        let specificEdgeScheme: NetworkScheme<UnassignedInnerNode> =
-            (Connect.sameTendenciesAppropriately +
-                Connect.differentTendenciesAppropriately).pullback(nodeMapper)
-            * Connect.differentIndices()
-
-        let sameIntEdgesScheme: NetworkScheme<UnassignedInnerNode> =
-            Connect.upToDown() * Connect.sameIndices()
-
-        let specificSourceScheme: NetworkScheme<UnassignedInnerNode> =
-            Connect.sourceToDown.pullback(nodeMapper)
-
-        let specificSinkScheme: NetworkScheme<UnassignedInnerNode> =
-            Connect.upToSink.pullback(nodeMapper)
-
-        let allSchemes: [NetworkScheme<UnassignedInnerNode>] = [
-            specificEdgeScheme,
-            sameIntEdgesScheme,
-            specificSourceScheme,
-            specificSinkScheme
-        ]
-
-        let maskScheme: NetworkScheme<AssignedInnerNode> = allSchemes
-            .reduce(NetworkScheme { _ in false }, +)
-            .pullback({ $0.unassigned })
-
-        // Apply masking of specific manifestations of the general global adjacency schemes
-        self.network.mask(maskScheme)
     }
 }
 
@@ -99,10 +109,9 @@ extension InvertingSpellingNetwork {
         return PitchSpellingNetworkFactory(weightScheme)
     }
 
-    /// - Returns: A concrete distribution of weights to satisfy the weight relationships delimited by
-    /// `weightDependencies` or `nil` if no such distribution is possible, i.e. there are cyclical
-    /// dependencies between edge types. In the latter case, the spellings fed in are *inconsistent*.
-    /// Weights are parametrized by `Pitch.Class` and `Tendency` values.
+    /// - Returns: A concrete distribution of weights, subject to `groupScheme` designating PitchedEdge` values`
+    /// that should take the same value, `preset` designating preset weights applied to any `PitchedEdge`
+    /// values.
     public func generateWeights (
         _ preset: Memo<PitchedEdge>? = nil,
         _ groupScheme: [PitchedEdge: Set<PitchedEdge>] = [:]
@@ -114,6 +123,10 @@ extension InvertingSpellingNetwork {
         return generateWeights(from: pitchedDependencies, preset)
     }
 
+    /// - Returns: A distribution of weights, subject to weight  dependency structure `dependencies`, `groupScheme` designating
+    /// `PitchedEdge` values that should take the same value, `preset` designating preset weights applied to any `PitchedEdge`
+    /// values.
+    // FIXME: move `preset?.pullback` to this layer
     func generateWeightsFromClumpedGraph (
         _ dependencies: DiGraph<PitchedEdge>,
         _ preset: Memo<Set<PitchedEdge>>? = nil,
@@ -131,6 +144,8 @@ extension InvertingSpellingNetwork {
             }
     }
 
+    /// - Returns: A distribution of weights such that the conditions implied by `dependencies` are met,
+    /// namely, that a `Node` value is greater than or equal to the sum of its neighbors.
     func generateWeights<Node> (
         from dependencies: DiGraph<Node>,
         _ preset: Memo<Node>? = nil
@@ -160,14 +175,6 @@ extension InvertingSpellingNetwork {
             let _ = getWeight(&weights, dependency)
         }
         return dependencies.adjacencies.reduce(into: [:], dependenciesReducer)
-    }
-    
-    struct Memo<Node> {
-        let weight: (Node) -> Double?
-        
-        init(_ weight: @escaping (Node) -> Double?) {
-            self.weight = weight
-        }
     }
 
     /// - Returns: For each `Edge`, a `Set` of `Edge` values, the sum of whose weights the edge's weight
@@ -212,6 +219,7 @@ extension InvertingSpellingNetwork {
 
 extension InvertingSpellingNetwork {
     
+    /// Connects indices that share the same associated value
     func partition (via indices: [Int: Int]) {
         let adjacencyScheme = NetworkScheme<Int> { edge in
             switch (edge.a, edge.b) {
@@ -224,6 +232,7 @@ extension InvertingSpellingNetwork {
         connect(via: adjacencyScheme)
     }
     
+    /// Connects nodes based on `scheme`
     func connect(via scheme: NetworkScheme<Int>) {
         let temp: NetworkScheme<Cross<Int, Tendency>>
             = (scheme + NetworkScheme<Int> { edge in edge.a == edge.b }).pullback(get(\Cross.a))
@@ -357,6 +366,8 @@ extension InvertingSpellingNetwork {
 }
 
 extension InvertingSpellingNetwork.Memo where Node: Hashable {
+    
+    /// - Returns: `Memo` applied over sets of `Node` values
     func pullback() -> InvertingSpellingNetwork.Memo<Set<Node>> {
         return InvertingSpellingNetwork.Memo<Set<Node>> ({
             let representative = $0.first!
