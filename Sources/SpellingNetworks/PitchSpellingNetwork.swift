@@ -151,7 +151,13 @@ extension PitchSpellingNetwork {
     
     // Adjusts edge weights based on an external scaling rule
     func mask <T> (scheme: FlowNetworkScheme<T>, _ lens: @escaping (Int) -> T) {
-        _maskScheme *= scheme.pullback( Index.downCast >>> { lens($0.a) })
+        _maskScheme *= scheme.pullback(Index.downCast >>> get(\.a) >>> lens)
+    }
+    
+    // Masks in or out edges according to the `Int` index of the node
+    func adjacencyMask (scheme: UnweightedGraphScheme<Int>) {
+        let flowScheme: FlowNetworkScheme<Int> = 1.0 * scheme.lifted
+        _maskScheme *= flowScheme.pullback(Index.downCast >>> get(\.a))
     }
 
     /// - Returns: An array of `SpelledPitch` values with the same indices as the original

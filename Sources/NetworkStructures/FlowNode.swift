@@ -41,13 +41,16 @@ public func bind <S: Hashable, A: Hashable> (_ f: @escaping (S) -> A?) -> (FlowN
 }
 
 /// - Returns: predicate on `Edge` type lifted to `FlowNode` layer
-public func bind <A: Hashable> (
+public func lift <A: Hashable> (
+    includesSourceAndSinkEdges: Bool = false,
     _ f: @escaping (OrderedPair<A>) -> Bool
 ) -> (OrderedPair<FlowNode<A>>) -> Bool {
         return { edge in
             switch (edge.a, edge.b) {
             case let (.internal(a), .internal(b)):
                 return f(OrderedPair(a, b))
+            case (.source, .internal), (.internal, .sink):
+                return includesSourceAndSinkEdges
             default:
                 return false
             }

@@ -258,6 +258,19 @@ class PitchSpellingNetworkTests: XCTestCase {
         XCTAssertEqual(spelledPitches[13]!.spelling, .g)
     }
     
+    func testCaseForWebApp() {
+        let pitchSpellingNetwork = PitchSpellingNetwork(pitches: [0: 61, 1: 63, 2: 65], weightScheme: weightScheme!)
+        let selected: [(Int, Int)] = [(0,1)]
+        pitchSpellingNetwork.adjacencyMask(scheme: UnweightedGraphScheme { edge in
+            !selected.reduce(into: Set<OrderedPair<Int>>()) { running, pair in
+                running.insert(.init(pair.0, pair.1))
+                running.insert(.init(pair.1, pair.0))
+            }.contains(edge)
+        })
+        let spelledPitches = pitchSpellingNetwork.spell()
+        dump(spelledPitches)
+    }
+    
     override func tearDown() {
         weightScheme = nil
         super.tearDown()

@@ -23,7 +23,7 @@ struct AdjacencySchemes {
     /// Adjacency scheme that connects `.up` tendencies to `.down` tendencies
     /// for sameInts
     static func upToDown <Index: Hashable> () -> NetworkScheme<Cross<Index, Tendency>> {
-        return NetworkScheme<Tendency>(bind { edge in edge.a == .up && edge.b == .down })
+        return NetworkScheme<Tendency>(lift { edge in edge.a == .up && edge.b == .down })
             .pullback(get(\Cross.b))
     }
     
@@ -47,12 +47,12 @@ struct AdjacencySchemes {
     
     /// Adjacency scheme that connects nodes with the same `int` value
     static func sameIndices <Index: Hashable> () -> NetworkScheme<Cross<Index, Tendency>> {
-        return NetworkScheme<Index> (bind { edge in edge.a == edge.b }).pullback(get(\Cross.a))
+        return NetworkScheme<Index> (lift { edge in edge.a == edge.b }).pullback(get(\Cross.a))
     }
     
     /// Adjacency scheme that connects nodes with different `int` values
     static func differentIndices <Index: Hashable> () -> NetworkScheme<Cross<Index, Tendency>> {
-        return NetworkScheme<Index> (bind { edge in edge.a != edge.b }).pullback(get(\Cross.a))
+        return NetworkScheme<Index> (lift { edge in edge.a != edge.b }).pullback(get(\Cross.a))
     }
     
     /// Adjacency scheme that connects nodes with different `Tendency` values for the right `Pitch.Class` values
@@ -67,14 +67,14 @@ struct AdjacencySchemes {
     
     /// Adjacency scheme that connects `.up` tendencies to `.down` tendencies and vice versa
     static let connectDifferentTendencies: NetworkScheme<Cross<Pitch.Class, Tendency>> =
-        NetworkScheme (bind { edge in
+        NetworkScheme (lift { edge in
             edge.a.b != edge.b.b
                 && PitchClassesForDifferentTendenciesLookup.contains(.init(edge.a.a, edge.b.a))
             })
     
     /// Adjacency scheme that connects nodes with the same tendency
     static let connectSameTendencies: NetworkScheme<Cross<Pitch.Class, Tendency>> =
-        NetworkScheme (bind { edge in
+        NetworkScheme (lift { edge in
         edge.a.b == edge.b.b
             && !PitchClassesForDifferentTendenciesLookup.contains(.init(edge.a.a, edge.b.a))
         })
@@ -82,14 +82,14 @@ struct AdjacencySchemes {
     /// Adjacency scheme that connects nodes according to presence in lookup table
     /// `PitchClassesForDifferentTendenciesLookup`
     static let connectPitchClassesForDifferentTendencies: NetworkScheme<Cross<Pitch.Class, Tendency>> =
-        NetworkScheme (bind { edge in
+        NetworkScheme (lift { edge in
             PitchClassesForDifferentTendenciesLookup.contains(.init(edge.a.a, edge.b.a))
         })
     
     /// Adjacency scheme that connects nodes according to absence in lookup table
     /// `PitchClassesForDifferentTendenciesLookup`
     static let connectPitchClassesForSameTendencies: NetworkScheme<Cross<Pitch.Class, Tendency>> =
-        NetworkScheme (bind { edge in
+        NetworkScheme (lift { edge in
             return !PitchClassesForDifferentTendenciesLookup.contains(.init(edge.a.a, edge.b.a))
         })
     
