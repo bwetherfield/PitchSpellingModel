@@ -18,30 +18,6 @@ class InvertingSpellingNetwork {
 
     // MARK: - Initializers
 
-    convenience init(spellings: [[Pitch.Spelling]]) {
-        let flattenedSpellings: [Pitch.Spelling] = spellings.reduce(into: []) { flattened, list in
-            list.forEach { flattened.append($0) }
-        }
-        self.init(spellings: flattenedSpellings)
-        var runningCount = 0
-        var indexing: [Int: Int] = [:]
-        for (index, container) in spellings.enumerated() {
-            for (i,_) in container.enumerated() {
-                indexing[i + runningCount] = index
-            }
-            runningCount += container.count
-        }
-        self.partition(via: indexing)
-    }
-
-    convenience init(spellings: [Pitch.Spelling]) {
-        let indexed: [Int: Pitch.Spelling] = spellings.enumerated().reduce(into: [:]) { indexedSpellings, indexedSpelling in
-            let (index, spelling) = indexedSpelling
-            indexedSpellings[index] = spelling
-        }
-        self.init(spellings: indexed)
-    }
-
     init(spellings: [Int: Pitch.Spelling]) {
         self.network = UnweightedNetwork(internalNodes: internalNodes(spellings: spellings))
         self.pitchClass = { int in spellings[int]?.pitchClass }
@@ -69,6 +45,30 @@ class InvertingSpellingNetwork {
             .reduce(NetworkScheme { _ in false }, +)
             .pullback({ $0.unassigned })
         self.network.mask(maskScheme)
+    }
+    
+    convenience init(spellings: [[Pitch.Spelling]]) {
+        let flattenedSpellings: [Pitch.Spelling] = spellings.reduce(into: []) { flattened, list in
+            list.forEach { flattened.append($0) }
+        }
+        self.init(spellings: flattenedSpellings)
+        var runningCount = 0
+        var indexing: [Int: Int] = [:]
+        for (index, container) in spellings.enumerated() {
+            for (i,_) in container.enumerated() {
+                indexing[i + runningCount] = index
+            }
+            runningCount += container.count
+        }
+        self.partition(via: indexing)
+    }
+
+    convenience init(spellings: [Pitch.Spelling]) {
+        let indexed: [Int: Pitch.Spelling] = spellings.enumerated().reduce(into: [:]) { indexedSpellings, indexedSpelling in
+            let (index, spelling) = indexedSpelling
+            indexedSpellings[index] = spelling
+        }
+        self.init(spellings: indexed)
     }
 }
 
