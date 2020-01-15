@@ -12,7 +12,7 @@ import Encodings
 
 /// Stores `weightScheme` for creating `PitchSpellingNetwork` instance from `pitches` and `phantomPitches` of
 /// varying types
-class PitchSpellingNetworkFactory {
+public class PitchSpellingNetworkFactory {
     
     // MARK: - Instance Properties
     

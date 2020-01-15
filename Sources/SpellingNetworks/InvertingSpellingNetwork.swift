@@ -12,12 +12,12 @@ import Pitch
 import SpelledPitch
 
 /// Wraps unweighted network for generating weight parameters for `PitchSpellingNetwork` types.
-class InvertingSpellingNetwork {
+public class InvertingSpellingNetwork {
     
     // MARK: - Associated Types
     
     // Wrapper for weight function, supporting optional chaining.
-    struct Memo<Node> {
+    public struct Memo<Node> {
         let weight: (Node) -> Double?
         
         init(_ weight: @escaping (Node) -> Double?) {
