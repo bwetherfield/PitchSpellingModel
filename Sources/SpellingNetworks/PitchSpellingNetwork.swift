@@ -142,7 +142,7 @@ public class PitchSpellingNetwork {
 
 extension PitchSpellingNetwork {
     
-    enum Preference {
+    public enum Preference {
         case sharps
         case flats
     }
@@ -150,19 +150,19 @@ extension PitchSpellingNetwork {
     // MARK: - Instance Methods
     
     // Adjusts edge weights based on an external scaling rule
-    func mask <T> (scheme: FlowNetworkScheme<T>, _ lens: @escaping (Int) -> T) {
+    public func mask <T> (scheme: FlowNetworkScheme<T>, _ lens: @escaping (Int) -> T) {
         _maskScheme *= scheme.pullback(Index.downCast >>> get(\.a) >>> lens)
     }
     
     // Masks in or out edges according to the `Int` index of the node
-    func adjacencyMask (scheme: UnweightedGraphScheme<Int>) {
+    public func adjacencyMask (scheme: UnweightedGraphScheme<Int>) {
         let flowScheme: FlowNetworkScheme<Int> = 1.0 * scheme.lifted
         _maskScheme *= flowScheme.pullback(Index.downCast >>> get(\.a))
     }
 
     /// - Returns: An array of `SpelledPitch` values with the same indices as the original
     /// unspelled `Pitch` values.
-    func spell(preferring preference: Preference = .sharps) -> [Int: SpelledPitch] {
+    public func spell(preferring preference: Preference = .sharps) -> [Int: SpelledPitch] {
         if let scheme = maskScheme {
             flowNetwork.mask(scheme)
             maskScheme = nil

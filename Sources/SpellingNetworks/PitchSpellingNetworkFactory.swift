@@ -26,15 +26,15 @@ public class PitchSpellingNetworkFactory {
     
     // MARK: - Instance Methods
 
-    func build (from pitches: [Int: Pitch], withPhantomPitches phantomPitches: [Pitch] = []) -> PitchSpellingNetwork {
+    public func build (from pitches: [Int: Pitch], withPhantomPitches phantomPitches: [Pitch] = []) -> PitchSpellingNetwork {
         return PitchSpellingNetwork(pitches: pitches, weightScheme: weightScheme, phantomPitches: index(phantomPitches))
     }
     
-    func build (from pitches: [[Pitch]], withPhantomPitches phantomPitches: [Pitch] = []) -> PitchSpellingNetwork {
+    public func build (from pitches: [[Pitch]], withPhantomPitches phantomPitches: [Pitch] = []) -> PitchSpellingNetwork {
         return PitchSpellingNetwork(pitches: pitches, weightScheme: weightScheme, phantomPitches: index(phantomPitches))
     }
     
-    func build (from pitches: [Pitch], withPhantomPitches phantomPitches: [Pitch] = []) -> PitchSpellingNetwork {
+    public func build (from pitches: [Pitch], withPhantomPitches phantomPitches: [Pitch] = []) -> PitchSpellingNetwork {
         return PitchSpellingNetwork(pitches: pitches, weightScheme: weightScheme, phantomPitches: index(phantomPitches))
     }
     
